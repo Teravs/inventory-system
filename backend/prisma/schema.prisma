@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  VIEWER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum InventoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ActivityAction {
+  CREATE
+  UPDATE
+  DELETE
+  CHANGE_ROLE
+  ACTIVATE
+  DEACTIVATE
+}
+
+model User {
+  id       Int        @id @default(autoincrement())
+  name     String
+  username String     @unique
+  password String
+  role     UserRole   @default(VIEWER)
+  status   UserStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdInventory Inventory[] @relation("InventoryCreatedBy")
+  updatedInventory Inventory[] @relation("InventoryUpdatedBy")
+  activityLogs     ActivityLog[]
+
+  @@map("users")
+}
+
+model Category {
+  id     Int            @id @default(autoincrement())
+  name   String         @unique
+  status CategoryStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  inventories Inventory[]
+
+  @@map("categories")
+}
+
+model Inventory {
+  assetNumber    String          @id
+  serialNumber   String?
+  name           String
+  brand          String?
+  categoryId     Int
+  assignedTo     String?
+  devicePassword String?
+  purchaseMonth  String?
+  qrCode         String
+  status         InventoryStatus @default(ACTIVE)
+
+  createdById Int
+  updatedById Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category Category @relation(fields: [categoryId], references: [id])
+
+  createdBy User @relation("InventoryCreatedBy", fields: [createdById], references: [id])
+
+  updatedBy User @relation("InventoryUpdatedBy", fields: [updatedById], references: [id])
+
+  @@index([categoryId])
+  @@index([status])
+
+  @@map("inventory")
+}
+
+model ActivityLog {
+  id          BigInt         @id @default(autoincrement())
+  userId      Int
+  action      ActivityAction
+  entityType  String
+  entityId    String
+  description String?
+  oldData     Json?
+  newData     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+
+  @@map("activity_logs")
+}

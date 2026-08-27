@@ -95,8 +95,9 @@ export class UserService {
     if (data.username) updatePayload.username = data.username;
     if (data.role) updatePayload.role = data.role;
     if (data.status) updatePayload.status = data.status;
-    if (data.passwordPlain) {
-      updatePayload.password = await bcrypt.hash(data.passwordPlain, 10);
+    const rawPassword = data.passwordPlain || (data as unknown as { password?: string }).password;
+    if (rawPassword && rawPassword.trim() !== '') {
+      updatePayload.password = await bcrypt.hash(rawPassword.trim(), 10);
     }
 
     const updatedUser = await prisma.user.update({

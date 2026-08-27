@@ -24,7 +24,8 @@ export const InventoryListPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('');
 
   // Dialog State
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   // Form State
@@ -39,6 +40,7 @@ export const InventoryListPage: React.FC = () => {
     purchaseMonth: new Date().toISOString().substring(0, 7)
   });
   const [formError, setFormError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -74,25 +76,71 @@ export const InventoryListPage: React.FC = () => {
     fetchCategories();
   }, []);
 
-  const handleCreateSubmit = async (e: React.FormEvent) => {
+  const openCreateModal = () => {
+    setEditingItem(null);
+    setFormData({
+      assetNumber: '',
+      serialNumber: '',
+      name: '',
+      brand: '',
+      categoryId: categories.length > 0 ? String(categories[0].id) : '',
+      assignedTo: '',
+      devicePassword: '',
+      purchaseMonth: new Date().toISOString().substring(0, 7)
+    });
+    setFormError(null);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (item: InventoryItem) => {
+    setEditingItem(item);
+    setFormData({
+      assetNumber: item.assetNumber,
+      serialNumber: item.serialNumber || '',
+      name: item.name,
+      brand: item.brand || '',
+      categoryId: String(item.categoryId || item.category?.id || ''),
+      assignedTo: item.assignedTo || '',
+      devicePassword: item.devicePassword || '',
+      purchaseMonth: item.purchaseMonth || new Date().toISOString().substring(0, 7)
+    });
+    setFormError(null);
+    setModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+    setSaving(true);
     try {
-      await api.post('/inventory', formData);
-      setCreateModalOpen(false);
-      setFormData({
-        assetNumber: '',
-        serialNumber: '',
-        name: '',
-        brand: '',
-        categoryId: '',
-        assignedTo: '',
-        devicePassword: '',
-        purchaseMonth: new Date().toISOString().substring(0, 7)
-      });
+      if (editingItem) {
+        await api.put(`/inventory/${editingItem.assetNumber}`, {
+          name: formData.name.trim(),
+          brand: formData.brand.trim() || null,
+          categoryId: Number(formData.categoryId),
+          serialNumber: formData.serialNumber.trim() || null,
+          assignedTo: formData.assignedTo.trim() || null,
+          devicePassword: formData.devicePassword ? formData.devicePassword : null,
+          purchaseMonth: formData.purchaseMonth
+        });
+      } else {
+        await api.post('/inventory', {
+          assetNumber: formData.assetNumber.trim(),
+          name: formData.name.trim(),
+          brand: formData.brand.trim() || null,
+          categoryId: Number(formData.categoryId),
+          serialNumber: formData.serialNumber.trim() || null,
+          assignedTo: formData.assignedTo.trim() || null,
+          devicePassword: formData.devicePassword || null,
+          purchaseMonth: formData.purchaseMonth
+        });
+      }
+      setModalOpen(false);
       fetchItems();
     } catch (err: any) {
-      setFormError(err.response?.data?.message || 'Failed to register inventory item');
+      setFormError(err.response?.data?.message || 'Failed to save inventory item');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -127,7 +175,7 @@ export const InventoryListPage: React.FC = () => {
           <p style={{ fontSize: '0.875rem', color: 'var(--text-sub)' }}>Track all physical hardware, assets, and assignment statuses</p>
         </div>
         {canManage && (
-          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
+          <Button variant="primary" onClick={openCreateModal}>
             <Plus size={18} /> Register Asset
           </Button>
         )}
@@ -194,15 +242,18 @@ export const InventoryListPage: React.FC = () => {
                   <td style={{ padding: '0.75rem 1rem' }}><Badge variant={item.status}>{item.status}</Badge></td>
                   <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', gap: '0.25rem' }}>
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/inventory/${item.assetNumber}`)}>
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/inventory/${item.assetNumber}`)} title="View detail">
                         <Eye size={16} />
                       </Button>
                       {canManage && (
                         <>
-                          <Button variant="ghost" size="sm" onClick={() => toggleStatus(item.assetNumber, item.status)}>
+                          <Button variant="ghost" size="sm" onClick={() => openEditModal(item)} title="Edit item">
+                            <Edit2 size={16} />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => toggleStatus(item.assetNumber, item.status)} title="Toggle status">
                             <Power size={16} color={item.status === 'ACTIVE' ? 'var(--warning)' : 'var(--success)'} />
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => setDeleteTarget(item.assetNumber)}>
+                          <Button variant="ghost" size="sm" onClick={() => setDeleteTarget(item.assetNumber)} title="Delete item">
                             <Trash2 size={16} color="var(--danger)" />
                           </Button>
                         </>
@@ -216,27 +267,79 @@ export const InventoryListPage: React.FC = () => {
         </table>
       </div>
 
-      {/* Creation Modal */}
-      <Modal isOpen={createModalOpen} onClose={() => setCreateModalOpen(false)} title="Register New Hardware Asset">
+      {/* Modal for Create and Edit */}
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={editingItem ? `Edit Asset: ${editingItem.assetNumber}` : 'Register New Hardware Asset'}
+      >
         {formError && <div style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{formError}</div>}
-        <form onSubmit={handleCreateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <Input label="Asset Number (Primary Key)" required value={formData.assetNumber} onChange={(e) => setFormData({ ...formData, assetNumber: e.target.value })} placeholder="e.g. AST-LPT-001" />
-          <Input label="Item Name" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. ThinkPad T14s Gen 3" />
-          <Input label="Brand / Manufacturer" value={formData.brand} onChange={(e) => setFormData({ ...formData, brand: e.target.value })} placeholder="e.g. Lenovo" />
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <Input
+            label="Asset Number (Primary Key)"
+            required
+            disabled={!!editingItem}
+            value={formData.assetNumber}
+            onChange={(e) => setFormData({ ...formData, assetNumber: e.target.value })}
+            placeholder="e.g. AST-LPT-001"
+            helperText={editingItem ? 'Asset number cannot be changed' : undefined}
+          />
+          <Input
+            label="Item Name"
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="e.g. ThinkPad T14s Gen 3"
+          />
+          <Input
+            label="Brand / Manufacturer"
+            value={formData.brand}
+            onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+            placeholder="e.g. Lenovo"
+          />
           <div>
             <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>Category *</label>
-            <select required value={formData.categoryId} onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })} style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginTop: '0.25rem' }}>
+            <select
+              required
+              value={formData.categoryId}
+              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+              style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginTop: '0.25rem' }}
+            >
               <option value="">Select Category</option>
               {categories.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
             </select>
           </div>
-          <Input label="Serial Number (Optional)" value={formData.serialNumber} onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })} />
-          <Input label="Assigned Person (Name only)" value={formData.assignedTo} onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })} placeholder="e.g. Budi Santoso" />
-          <Input label="Device Password (Hidden by default)" type="password" value={formData.devicePassword} onChange={(e) => setFormData({ ...formData, devicePassword: e.target.value })} />
-          <Input label="Purchase Month (YYYY-MM)" type="month" required value={formData.purchaseMonth} onChange={(e) => setFormData({ ...formData, purchaseMonth: e.target.value })} />
+          <Input
+            label="Serial Number (Optional)"
+            value={formData.serialNumber}
+            onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
+            placeholder="e.g. SN-982347-XYZ"
+          />
+          <Input
+            label="Assigned Person (Name only)"
+            value={formData.assignedTo}
+            onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+            placeholder="e.g. Budi Santoso"
+          />
+          <Input
+            label="Device Password"
+            type="password"
+            value={formData.devicePassword}
+            onChange={(e) => setFormData({ ...formData, devicePassword: e.target.value })}
+            placeholder={editingItem ? 'Enter new device password or leave unchanged' : 'Optional password'}
+          />
+          <Input
+            label="Purchase Month (YYYY-MM)"
+            type="month"
+            required
+            value={formData.purchaseMonth}
+            onChange={(e) => setFormData({ ...formData, purchaseMonth: e.target.value })}
+          />
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
-            <Button variant="outline" type="button" onClick={() => setCreateModalOpen(false)}>Cancel</Button>
-            <Button variant="primary" type="submit">Create Asset</Button>
+            <Button variant="outline" type="button" onClick={() => setModalOpen(false)}>Cancel</Button>
+            <Button variant="primary" type="submit" isLoading={saving}>
+              {editingItem ? 'Save Changes' : 'Create Asset'}
+            </Button>
           </div>
         </form>
       </Modal>

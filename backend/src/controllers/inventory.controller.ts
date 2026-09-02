@@ -24,7 +24,8 @@ export class InventoryController {
 
   static async getByAsset(req: Request, res: Response, next: NextFunction) {
     try {
-      const item = await InventoryService.getByAssetNumber(req.params.assetNumber, req.user!.role);
+      const assetNumber = Array.isArray(req.params.assetNumber) ? req.params.assetNumber[0] : req.params.assetNumber;
+      const item = await InventoryService.getByAssetNumber(assetNumber, req.user!.role);
       sendSuccess(res, 'Inventory detail retrieved', item);
     } catch (err: unknown) {
       if (err instanceof Error) sendError(res, err.message, 404);
@@ -55,8 +56,9 @@ export class InventoryController {
 
   static async update(req: Request, res: Response, next: NextFunction) {
     try {
+      const assetNumber = Array.isArray(req.params.assetNumber) ? req.params.assetNumber[0] : req.params.assetNumber;
       const item = await InventoryService.update(
-        req.params.assetNumber,
+        assetNumber,
         req.body,
         req.user!.id,
         req.ip,
@@ -76,8 +78,9 @@ export class InventoryController {
         sendError(res, 'Status is required.', 400);
         return;
       }
+      const assetNumber = Array.isArray(req.params.assetNumber) ? req.params.assetNumber[0] : req.params.assetNumber;
       const item = await InventoryService.changeStatus(
-        req.params.assetNumber,
+        assetNumber,
         status as InventoryStatus,
         req.user!.id,
         req.ip,
@@ -92,8 +95,9 @@ export class InventoryController {
 
   static async delete(req: Request, res: Response, next: NextFunction) {
     try {
+      const assetNumber = Array.isArray(req.params.assetNumber) ? req.params.assetNumber[0] : req.params.assetNumber;
       await InventoryService.permanentDelete(
-        req.params.assetNumber,
+        assetNumber,
         req.user!.id,
         req.ip,
         req.headers['user-agent']

@@ -8,7 +8,18 @@ import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Modal } from '../../components/common/Modal';
-import { ArrowLeft, Eye, EyeOff, Edit2 } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Eye, 
+  EyeOff, 
+  Edit2, 
+  Calendar, 
+  User, 
+  Tag, 
+  Hash, 
+  KeyRound, 
+  AlignLeft
+} from 'lucide-react';
 
 export const InventoryDetailPage: React.FC = () => {
   const { assetNumber } = useParams<{ assetNumber: string }>();
@@ -30,6 +41,7 @@ export const InventoryDetailPage: React.FC = () => {
     serialNumber: '',
     assignedTo: '',
     devicePassword: '',
+    description: '',
     purchaseMonth: ''
   });
   const [editError, setEditError] = useState<string | null>(null);
@@ -70,6 +82,7 @@ export const InventoryDetailPage: React.FC = () => {
       serialNumber: item.serialNumber || '',
       assignedTo: item.assignedTo || '',
       devicePassword: item.devicePassword || '',
+      description: item.description || '',
       purchaseMonth: item.purchaseMonth || ''
     });
     setEditError(null);
@@ -89,6 +102,7 @@ export const InventoryDetailPage: React.FC = () => {
         serialNumber: editFormData.serialNumber.trim() || null,
         assignedTo: editFormData.assignedTo.trim() || null,
         devicePassword: editFormData.devicePassword ? editFormData.devicePassword : null,
+        description: editFormData.description.trim() || null,
         purchaseMonth: editFormData.purchaseMonth
       });
       setEditModalOpen(false);
@@ -102,73 +116,135 @@ export const InventoryDetailPage: React.FC = () => {
 
   const canManage = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN';
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading asset specifications...</div>;
-  if (error || !item) return <div style={{ padding: '2rem', color: 'var(--danger)' }}>{error || 'Not found'}</div>;
+  if (loading) {
+    return (
+      <div style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--text-sub)' }}>
+        <div
+          style={{
+            width: '32px',
+            height: '32px',
+            border: '3px solid var(--border)',
+            borderTopColor: 'var(--primary)',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+            margin: '0 auto 0.75rem'
+          }}
+        />
+        Loading asset specifications...
+      </div>
+    );
+  }
+
+  if (error || !item) {
+    return (
+      <div className="modern-card" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '500px', margin: '2rem auto' }}>
+        <p style={{ color: 'var(--danger)', fontWeight: 600, fontSize: '1.1rem', marginBottom: '1rem' }}>
+          {error || 'Asset not found'}
+        </p>
+        <Button variant="outline" size="sm" onClick={() => navigate('/inventory')}>
+          <ArrowLeft size={16} /> Back to Inventory
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
         <Button variant="outline" size="sm" onClick={() => navigate('/inventory')}>
           <ArrowLeft size={16} /> Back to Inventory
         </Button>
         {canManage && (
           <Button variant="primary" size="sm" onClick={openEditModal}>
-            <Edit2 size={16} /> Edit Asset
+            <Edit2 size={16} /> Edit Asset Specifications
           </Button>
         )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
         {/* Detail Card */}
-        <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+        <div className="modern-card" style={{ padding: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
             <div>
-              <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>{item.assetNumber}</span>
-              <h1 style={{ fontSize: '1.4rem', fontWeight: 700 }}>{item.name}</h1>
-              <p style={{ color: 'var(--text-sub)' }}>{item.brand || 'Standard Issue'}</p>
+              <span style={{ fontSize: '0.8125rem', color: 'var(--primary)', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+                {item.assetNumber}
+              </span>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginTop: '0.15rem' }}>
+                {item.name}
+              </h1>
+              <p style={{ color: 'var(--text-sub)', fontSize: '0.875rem' }}>{item.brand || 'Standard Issue Hardware'}</p>
             </div>
             <Badge variant={item.status}>{item.status}</Badge>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem', fontSize: '0.9rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.25rem', padding: '1.25rem', backgroundColor: '#F8FAFC', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
             <div>
-              <span style={{ color: 'var(--text-sub)', fontSize: '0.8rem', display: 'block' }}>Category</span>
-              <strong>{item.category?.name}</strong>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.25rem' }}>
+                <Tag size={13} /> Category
+              </span>
+              <strong style={{ fontSize: '0.925rem', color: 'var(--text-main)' }}>{item.category?.name}</strong>
             </div>
+
             <div>
-              <span style={{ color: 'var(--text-sub)', fontSize: '0.8rem', display: 'block' }}>Serial Number</span>
-              <strong>{item.serialNumber || '—'}</strong>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.25rem' }}>
+                <Hash size={13} /> Serial Number
+              </span>
+              <strong style={{ fontSize: '0.925rem', color: 'var(--text-main)', fontFamily: 'monospace' }}>
+                {item.serialNumber || '—'}
+              </strong>
             </div>
+
             <div>
-              <span style={{ color: 'var(--text-sub)', fontSize: '0.8rem', display: 'block' }}>Assigned Person</span>
-              <strong>{item.assignedTo || 'Unassigned'}</strong>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.25rem' }}>
+                <User size={13} /> Assigned Person
+              </span>
+              <strong style={{ fontSize: '0.925rem', color: 'var(--text-main)' }}>
+                {item.assignedTo || 'Unassigned'}
+              </strong>
             </div>
+
             <div>
-              <span style={{ color: 'var(--text-sub)', fontSize: '0.8rem', display: 'block' }}>Purchase Month</span>
-              <strong>{item.purchaseMonth}</strong>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.25rem' }}>
+                <Calendar size={13} /> Purchase Month
+              </span>
+              <strong style={{ fontSize: '0.925rem', color: 'var(--text-main)' }}>
+                {item.purchaseMonth}
+              </strong>
             </div>
           </div>
 
+          {/* Description / Specifications Section */}
+          <div style={{ marginTop: '1.25rem', padding: '1.25rem', backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.5rem' }}>
+              <AlignLeft size={13} /> Description & Specifications
+            </span>
+            <p style={{ fontSize: '0.9rem', color: item.description ? 'var(--text-main)' : 'var(--text-muted)', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+              {item.description || 'No description or technical specifications provided for this asset.'}
+            </p>
+          </div>
+
           {user?.role !== 'VIEWER' && item.devicePassword && (
-            <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: '#F8FAFC', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+            <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', backgroundColor: '#EFF6FF', borderRadius: 'var(--radius-lg)', border: '1px solid #BFDBFE' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Device Access Password</span>
+                <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <KeyRound size={14} /> Device Access Password
+                </span>
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--primary)', fontSize: '0.8rem' }}
+                  style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 600 }}
                 >
-                  {showPassword ? <><EyeOff size={14} /> Hide</> : <><Eye size={14} /> Show</>}
+                  {showPassword ? <><EyeOff size={14} /> Hide</> : <><Eye size={14} /> Show Password</>}
                 </button>
               </div>
-              <div style={{ marginTop: '0.25rem', fontFamily: 'monospace', fontWeight: 600 }}>
+              <div style={{ marginTop: '0.35rem', fontFamily: 'monospace', fontWeight: 700, fontSize: '1rem', color: '#1E3A8A' }}>
                 {showPassword ? item.devicePassword : '••••••••••••'}
               </div>
             </div>
           )}
 
-          <div style={{ marginTop: '2rem', borderTop: '1px solid var(--border)', paddingTop: '1rem', fontSize: '0.75rem', color: 'var(--text-sub)' }}>
-            <div>Created by: {item.createdBy?.name} on {new Date(item.createdAt).toLocaleDateString()}</div>
-            <div>Last update by: {item.updatedBy?.name} on {new Date(item.updatedAt).toLocaleDateString()}</div>
+          <div style={{ marginTop: '2rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem', fontSize: '0.775rem', color: 'var(--text-sub)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div>Created by: <strong>{item.createdBy?.name}</strong> on {new Date(item.createdAt).toLocaleDateString()}</div>
+            <div>Updated by: <strong>{item.updatedBy?.name}</strong> on {new Date(item.updatedAt).toLocaleDateString()}</div>
           </div>
         </div>
 
@@ -181,7 +257,7 @@ export const InventoryDetailPage: React.FC = () => {
       {/* Edit Modal */}
       <Modal isOpen={editModalOpen} onClose={() => setEditModalOpen(false)} title={`Edit Asset: ${item.assetNumber}`}>
         {editError && <div style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{editError}</div>}
-        <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
           <Input
             label="Item Name"
             required
@@ -194,12 +270,24 @@ export const InventoryDetailPage: React.FC = () => {
             onChange={(e) => setEditFormData({ ...editFormData, brand: e.target.value })}
           />
           <div>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>Category *</label>
+            <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '0.35rem' }}>
+              Category *
+            </label>
             <select
               required
               value={editFormData.categoryId}
               onChange={(e) => setEditFormData({ ...editFormData, categoryId: e.target.value })}
-              style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginTop: '0.25rem' }}
+              style={{
+                width: '100%',
+                padding: '0.55rem 0.85rem',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border)',
+                backgroundColor: '#FFFFFF',
+                color: 'var(--text-main)',
+                fontSize: '0.875rem',
+                outline: 'none',
+                boxShadow: 'var(--shadow-xs)'
+              }}
             >
               <option value="">Select Category</option>
               {categories.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
@@ -215,6 +303,30 @@ export const InventoryDetailPage: React.FC = () => {
             value={editFormData.assignedTo}
             onChange={(e) => setEditFormData({ ...editFormData, assignedTo: e.target.value })}
           />
+          <div>
+            <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '0.35rem' }}>
+              Description / Specifications (Optional)
+            </label>
+            <textarea
+              rows={3}
+              value={editFormData.description}
+              onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+              placeholder="e.g. Intel Core i7, 16GB RAM, 512GB SSD"
+              style={{
+                width: '100%',
+                padding: '0.55rem 0.85rem',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border)',
+                backgroundColor: '#FFFFFF',
+                color: 'var(--text-main)',
+                fontSize: '0.875rem',
+                outline: 'none',
+                boxShadow: 'var(--shadow-xs)',
+                fontFamily: 'inherit',
+                resize: 'vertical'
+              }}
+            />
+          </div>
           <Input
             label="Device Password"
             type="password"
@@ -229,7 +341,7 @@ export const InventoryDetailPage: React.FC = () => {
             value={editFormData.purchaseMonth}
             onChange={(e) => setEditFormData({ ...editFormData, purchaseMonth: e.target.value })}
           />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.65rem', marginTop: '0.5rem' }}>
             <Button variant="outline" type="button" onClick={() => setEditModalOpen(false)}>Cancel</Button>
             <Button variant="primary" type="submit" isLoading={saving}>Save Changes</Button>
           </div>

@@ -75,6 +75,7 @@ model Inventory {
   categoryId     Int
   assignedTo     String?
   devicePassword String?
+  description    String?         @db.Text
   purchaseMonth  String?
   qrCode         String
   status         InventoryStatus @default(ACTIVE)

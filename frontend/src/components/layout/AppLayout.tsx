@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { Menu } from 'lucide-react';
+import { Menu, Layers } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -15,24 +15,24 @@ export const AppLayout: React.FC = () => {
         <header
           style={{
             height: '60px',
-            backgroundColor: 'var(--surface)',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(12px)',
             borderBottom: '1px solid var(--border)',
             display: 'flex',
             alignItems: 'center',
-            padding: '0 1.5rem',
-            justifyContent: 'space-between',
+            padding: '0 1.25rem',
             position: 'sticky',
             top: 0,
             zIndex: 30
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
             <button
               onClick={() => setSidebarOpen(true)}
               aria-label="Toggle menu"
               style={{
                 border: '1px solid var(--border)',
-                background: 'var(--surface)',
+                background: '#FFFFFF',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -40,19 +40,33 @@ export const AppLayout: React.FC = () => {
                 padding: '0.45rem',
                 borderRadius: 'var(--radius-md)',
                 color: 'var(--text-main)',
-                transition: 'background 0.15s ease'
+                boxShadow: 'var(--shadow-xs)',
+                transition: 'all 0.15s ease'
               }}
             >
               <Menu size={20} />
             </button>
-            <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-main)' }}>
-              AssetKeeper
-            </span>
-          </div>
 
-          <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-sub)' }}>
-            Internal Company Network
-          </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '8px',
+                  background: 'var(--primary-gradient)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#FFFFFF'
+                }}
+              >
+                <Layers size={16} />
+              </div>
+              <span style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+                CHA Asset
+              </span>
+            </div>
+          </div>
         </header>
 
         <main className="page-body">

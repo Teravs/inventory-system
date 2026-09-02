@@ -6,7 +6,7 @@ import { Input } from '../../components/common/Input';
 import { Modal } from '../../components/common/Modal';
 import { Badge } from '../../components/common/Badge';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
-import { Plus, Edit, Trash2, Power } from 'lucide-react';
+import { Plus, Edit, Trash2, Power, Users } from 'lucide-react';
 
 export const UserListPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -127,63 +127,136 @@ export const UserListPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Internal Users</h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-sub)' }}>Manage employee login accounts and authorization levels</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <h1 style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+              User Accounts
+            </h1>
+            <span
+              style={{
+                backgroundColor: '#FAF5FF',
+                color: '#7C3AED',
+                padding: '0.2rem 0.65rem',
+                borderRadius: '9999px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                border: '1px solid #E9D5FF'
+              }}
+            >
+              {users.length} Users
+            </span>
+          </div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-sub)', marginTop: '0.2rem' }}>
+            Manage internal employee access credentials and role authorizations
+          </p>
         </div>
         <Button variant="primary" onClick={openCreateModal}>
-          <Plus size={18} /> Add User
+          <Plus size={17} /> Add User
         </Button>
       </div>
 
-      <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid var(--border)', backgroundColor: '#F8FAFC' }}>
-              <th style={{ padding: '0.75rem 1rem' }}>Name</th>
-              <th style={{ padding: '0.75rem 1rem' }}>Username</th>
-              <th style={{ padding: '0.75rem 1rem' }}>Role</th>
-              <th style={{ padding: '0.75rem 1rem' }}>Status</th>
-              <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={5} style={{ padding: '2rem', textAlign: 'center' }}>Loading system accounts...</td></tr>
-            ) : users.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-sub)' }}>No users found.</td></tr>
-            ) : (
-              users.map((u) => (
-                <tr key={u.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>{u.name}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>@{u.username}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}><Badge variant={u.role}>{u.role}</Badge></td>
-                  <td style={{ padding: '0.75rem 1rem' }}><Badge variant={u.status}>{u.status}</Badge></td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: '0.5rem' }}>
-                      <Button variant="ghost" size="sm" onClick={() => openEditModal(u)} title="Edit user">
-                        <Edit size={16} />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => toggleStatus(u)} title="Toggle status">
-                        <Power size={16} color={u.status === 'ACTIVE' ? 'var(--warning)' : 'var(--success)'} />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setDeleteTarget(u)} title="Delete user">
-                        <Trash2 size={16} color="var(--danger)" />
-                      </Button>
-                    </div>
+      <div className="modern-card" style={{ overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table className="modern-table">
+            <thead>
+              <tr>
+                <th>User Profile</th>
+                <th>Username</th>
+                <th>System Role</th>
+                <th>Status</th>
+                <th style={{ textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-sub)' }}>
+                    <div
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        border: '3px solid var(--border)',
+                        borderTopColor: 'var(--primary)',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite',
+                        margin: '0 auto 0.75rem'
+                      }}
+                    />
+                    Loading system accounts...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : users.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-sub)' }}>
+                    <Users size={32} style={{ margin: '0 auto 0.5rem', opacity: 0.4 }} />
+                    <p style={{ fontWeight: 600 }}>No users found.</p>
+                  </td>
+                </tr>
+              ) : (
+                users.map((u) => (
+                  <tr key={u.id}>
+                    <td>
+                      <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{u.name}</div>
+                    </td>
+                    <td>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--text-sub)' }}>
+                        @{u.username}
+                      </span>
+                    </td>
+                    <td>
+                      <Badge variant={u.role}>{u.role}</Badge>
+                    </td>
+                    <td>
+                      <Badge variant={u.status}>{u.status}</Badge>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEditModal(u)}
+                          title="Edit user"
+                          style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
+                        >
+                          <Edit size={16} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleStatus(u)}
+                          title="Toggle status"
+                          style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
+                        >
+                          <Power size={16} color={u.status === 'ACTIVE' ? 'var(--warning)' : 'var(--success)'} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteTarget(u)}
+                          title="Delete user"
+                          style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
+                        >
+                          <Trash2 size={16} color="var(--danger)" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editingUser ? `Edit User: @${editingUser.username}` : 'Create User Account'}>
-        {error && <div style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{error}</div>}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+        {error && (
+          <div style={{ color: 'var(--danger)', backgroundColor: '#FEF2F2', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-md)', fontSize: '0.825rem', marginBottom: '1rem', border: '1px solid #FECACA' }}>
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
           <Input
             label="Full Name"
             required
@@ -207,11 +280,23 @@ export const UserListPage: React.FC = () => {
             placeholder={editingUser ? '••••••••' : 'Enter secure password'}
           />
           <div>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>System Role</label>
+            <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '0.35rem' }}>
+              System Role
+            </label>
             <select
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value as Role })}
-              style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginTop: '0.25rem' }}
+              style={{
+                width: '100%',
+                padding: '0.55rem 0.85rem',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border)',
+                backgroundColor: '#FFFFFF',
+                color: 'var(--text-main)',
+                fontSize: '0.875rem',
+                outline: 'none',
+                boxShadow: 'var(--shadow-xs)'
+              }}
             >
               <option value="VIEWER">VIEWER (Read Only)</option>
               <option value="ADMIN">ADMIN (Inventory Operator)</option>
@@ -221,11 +306,23 @@ export const UserListPage: React.FC = () => {
 
           {editingUser && (
             <div>
-              <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>Account Status</label>
+              <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '0.35rem' }}>
+                Account Status
+              </label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as Status })}
-                style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginTop: '0.25rem' }}
+                style={{
+                  width: '100%',
+                  padding: '0.55rem 0.85rem',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border)',
+                  backgroundColor: '#FFFFFF',
+                  color: 'var(--text-main)',
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                  boxShadow: 'var(--shadow-xs)'
+                }}
               >
                 <option value="ACTIVE">ACTIVE</option>
                 <option value="INACTIVE">INACTIVE</option>
@@ -233,7 +330,7 @@ export const UserListPage: React.FC = () => {
             </div>
           )}
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.65rem', marginTop: '0.5rem' }}>
             <Button variant="outline" type="button" onClick={() => setModalOpen(false)}>Cancel</Button>
             <Button variant="primary" type="submit" isLoading={saving}>
               {editingUser ? 'Save Changes' : 'Create User'}

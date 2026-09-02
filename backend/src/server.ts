@@ -13,7 +13,7 @@ async function bootstrap() {
     console.log('Connected to MariaDB 10.4.x via Prisma');
 
     app.listen(ENV.PORT, () => {
-      console.log(`Backend server listening on http://localhost:${ENV.PORT}`);
+      console.log(`Backend server listening on http://localhost:${ENV.PORT}/api/health`);
     });
   } catch (err) {
     console.error('Failed to initialize database connection:', err);

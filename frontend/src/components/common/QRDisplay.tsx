@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Button } from './Button';
-import { Download } from 'lucide-react';
+import { Download, QrCode } from 'lucide-react';
 
 interface QRDisplayProps {
   value: string;
@@ -27,46 +27,48 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({ value, assetNumber }) => {
 
   return (
     <div
+      className="modern-card"
       style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '1rem',
-        padding: '1.5rem',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-lg)',
-        backgroundColor: 'var(--surface)',
-        boxShadow: 'var(--shadow-sm)'
+        gap: '1.25rem',
+        padding: '1.75rem'
       }}
     >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-sub)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <QrCode size={15} /> Physical QR Label
+      </div>
+
       <div
         ref={qrContainerRef}
         style={{
-          padding: '0.75rem',
+          padding: '0.85rem',
           backgroundColor: '#FFFFFF',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border)'
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-xs)'
         }}
       >
         <QRCodeCanvas
           value={value}
-          size={240}
+          size={220}
           level="H"
           includeMargin={true}
         />
       </div>
 
       <div style={{ textAlign: 'center' }}>
-        <span style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', display: 'block' }}>
+        <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', fontFamily: 'monospace', letterSpacing: '0.02em', display: 'block' }}>
           {assetNumber}
         </span>
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-sub)' }}>
-          Scan to view hardware detail
+        <span style={{ fontSize: '0.775rem', color: 'var(--text-sub)' }}>
+          Scan to quickly pull up hardware record
         </span>
       </div>
 
       <Button variant="primary" size="md" onClick={handleDownloadPng} style={{ width: '100%' }}>
-        <Download size={18} /> Download QR (PNG)
+        <Download size={17} /> Download QR (PNG)
       </Button>
     </div>
   );

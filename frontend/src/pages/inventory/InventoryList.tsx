@@ -8,7 +8,7 @@ import { Input } from '../../components/common/Input';
 import { Badge } from '../../components/common/Badge';
 import { Modal } from '../../components/common/Modal';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
-import { Plus, Search, Eye, Edit2, Power, Trash2 } from 'lucide-react';
+import { Plus, Search, Eye, Edit2, Power, Trash2, Boxes } from 'lucide-react';
 
 export const InventoryListPage: React.FC = () => {
   const { user } = useAuth();
@@ -37,6 +37,7 @@ export const InventoryListPage: React.FC = () => {
     categoryId: '',
     assignedTo: '',
     devicePassword: '',
+    description: '',
     purchaseMonth: new Date().toISOString().substring(0, 7)
   });
   const [formError, setFormError] = useState<string | null>(null);
@@ -86,6 +87,7 @@ export const InventoryListPage: React.FC = () => {
       categoryId: categories.length > 0 ? String(categories[0].id) : '',
       assignedTo: '',
       devicePassword: '',
+      description: '',
       purchaseMonth: new Date().toISOString().substring(0, 7)
     });
     setFormError(null);
@@ -102,6 +104,7 @@ export const InventoryListPage: React.FC = () => {
       categoryId: String(item.categoryId || item.category?.id || ''),
       assignedTo: item.assignedTo || '',
       devicePassword: item.devicePassword || '',
+      description: item.description || '',
       purchaseMonth: item.purchaseMonth || new Date().toISOString().substring(0, 7)
     });
     setFormError(null);
@@ -121,6 +124,7 @@ export const InventoryListPage: React.FC = () => {
           serialNumber: formData.serialNumber.trim() || null,
           assignedTo: formData.assignedTo.trim() || null,
           devicePassword: formData.devicePassword ? formData.devicePassword : null,
+          description: formData.description.trim() || null,
           purchaseMonth: formData.purchaseMonth
         });
       } else {
@@ -132,6 +136,7 @@ export const InventoryListPage: React.FC = () => {
           serialNumber: formData.serialNumber.trim() || null,
           assignedTo: formData.assignedTo.trim() || null,
           devicePassword: formData.devicePassword || null,
+          description: formData.description.trim() || null,
           purchaseMonth: formData.purchaseMonth
         });
       }
@@ -168,40 +173,106 @@ export const InventoryListPage: React.FC = () => {
   const canManage = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN';
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* Page Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Company Inventory</h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-sub)' }}>Track all physical hardware, assets, and assignment statuses</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <h1 style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+              Company Inventory
+            </h1>
+            <span
+              style={{
+                backgroundColor: '#EFF6FF',
+                color: 'var(--primary)',
+                padding: '0.2rem 0.65rem',
+                borderRadius: '9999px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                border: '1px solid #DBEAFE'
+              }}
+            >
+              {items.length} Assets
+            </span>
+          </div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-sub)', marginTop: '0.2rem' }}>
+            Track, assign, and manage physical hardware inventory
+          </p>
         </div>
+
         {canManage && (
           <Button variant="primary" onClick={openCreateModal}>
-            <Plus size={18} /> Register Asset
+            <Plus size={17} /> Register Asset
           </Button>
         )}
       </div>
 
       {/* Filter Bar */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
-        <Input
-          placeholder="Search asset, name, assigned user..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div
+        className="modern-card"
+        style={{
+          padding: '1rem 1.25rem',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '0.85rem',
+          alignItems: 'center'
+        }}
+      >
+        <div style={{ position: 'relative' }}>
+          <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }} />
+          <input
+            placeholder="Search asset, name, assigned person, description..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '0.55rem 0.85rem 0.55rem 2.25rem',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border)',
+              backgroundColor: '#FFFFFF',
+              color: 'var(--text-main)',
+              fontSize: '0.875rem',
+              outline: 'none',
+              boxShadow: 'var(--shadow-xs)'
+            }}
+          />
+        </div>
+
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}
+          style={{
+            padding: '0.55rem 0.85rem',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--border)',
+            backgroundColor: '#FFFFFF',
+            color: 'var(--text-main)',
+            fontSize: '0.875rem',
+            outline: 'none',
+            boxShadow: 'var(--shadow-xs)',
+            cursor: 'pointer'
+          }}
         >
           <option value="">All Categories</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
+
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}
+          style={{
+            padding: '0.55rem 0.85rem',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--border)',
+            backgroundColor: '#FFFFFF',
+            color: 'var(--text-main)',
+            fontSize: '0.875rem',
+            outline: 'none',
+            boxShadow: 'var(--shadow-xs)',
+            cursor: 'pointer'
+          }}
         >
           <option value="">All Statuses</option>
           <option value="ACTIVE">ACTIVE</option>
@@ -210,61 +281,127 @@ export const InventoryListPage: React.FC = () => {
       </div>
 
       {/* Table Box */}
-      <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid var(--border)', backgroundColor: '#F8FAFC' }}>
-              <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Asset #</th>
-              <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Name / Brand</th>
-              <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Category</th>
-              <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Assigned To</th>
-              <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Purchased</th>
-              <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Status</th>
-              <th style={{ padding: '0.75rem 1rem', fontWeight: 600, textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center' }}>Loading inventory records...</td></tr>
-            ) : items.length === 0 ? (
-              <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-sub)' }}>No inventory records found.</td></tr>
-            ) : (
-              items.map((item) => (
-                <tr key={item.assetNumber} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: 'var(--primary)' }}>{item.assetNumber}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>
-                    <div>{item.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-sub)' }}>{item.brand || '—'}</div>
-                  </td>
-                  <td style={{ padding: '0.75rem 1rem' }}>{item.category?.name}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>{item.assignedTo || 'Unassigned'}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>{item.purchaseMonth}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}><Badge variant={item.status}>{item.status}</Badge></td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: '0.25rem' }}>
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/inventory/${item.assetNumber}`)} title="View detail">
-                        <Eye size={16} />
-                      </Button>
-                      {canManage && (
-                        <>
-                          <Button variant="ghost" size="sm" onClick={() => openEditModal(item)} title="Edit item">
-                            <Edit2 size={16} />
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => toggleStatus(item.assetNumber, item.status)} title="Toggle status">
-                            <Power size={16} color={item.status === 'ACTIVE' ? 'var(--warning)' : 'var(--success)'} />
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => setDeleteTarget(item.assetNumber)} title="Delete item">
-                            <Trash2 size={16} color="var(--danger)" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
+      <div className="modern-card" style={{ overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table className="modern-table">
+            <thead>
+              <tr>
+                <th>Asset #</th>
+                <th>Name / Brand</th>
+                <th>Category</th>
+                <th>Assigned To</th>
+                <th>Purchase Month</th>
+                <th>Status</th>
+                <th style={{ textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-sub)' }}>
+                    <div
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        border: '3px solid var(--border)',
+                        borderTopColor: 'var(--primary)',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite',
+                        margin: '0 auto 0.75rem'
+                      }}
+                    />
+                    Loading inventory records...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : items.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-sub)' }}>
+                    <Boxes size={32} style={{ margin: '0 auto 0.5rem', opacity: 0.4 }} />
+                    <p style={{ fontWeight: 600 }}>No inventory records found.</p>
+                    <p style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>Try adjusting your search or filters.</p>
+                  </td>
+                </tr>
+              ) : (
+                items.map((item) => (
+                  <tr key={item.assetNumber}>
+                    <td style={{ fontWeight: 700, color: 'var(--primary)', fontFamily: 'monospace', fontSize: '0.875rem' }}>
+                      {item.assetNumber}
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{item.name}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-sub)' }}>
+                        {item.brand || '—'}
+                        {item.description && (
+                          <span style={{ marginLeft: '0.4rem', color: 'var(--text-muted)' }}>
+                            · {item.description.length > 35 ? item.description.substring(0, 35) + '...' : item.description}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <span style={{ backgroundColor: '#F1F5F9', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', fontSize: '0.775rem', fontWeight: 500, color: 'var(--text-main)' }}>
+                        {item.category?.name || 'General'}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 500 }}>{item.assignedTo || <span style={{ color: 'var(--text-muted)' }}>Unassigned</span>}</div>
+                    </td>
+                    <td>
+                      <span style={{ fontSize: '0.825rem', color: 'var(--text-sub)' }}>{item.purchaseMonth}</span>
+                    </td>
+                    <td>
+                      <Badge variant={item.status}>{item.status}</Badge>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => navigate(`/inventory/${item.assetNumber}`)}
+                          title="View detail"
+                          style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
+                        >
+                          <Eye size={16} color="var(--primary)" />
+                        </Button>
+                        {canManage && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openEditModal(item)}
+                              title="Edit item"
+                              style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
+                            >
+                              <Edit2 size={16} color="var(--text-main)" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleStatus(item.assetNumber, item.status)}
+                              title="Toggle status"
+                              style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
+                            >
+                              <Power size={16} color={item.status === 'ACTIVE' ? 'var(--warning)' : 'var(--success)'} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeleteTarget(item.assetNumber)}
+                              title="Delete item"
+                              style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
+                            >
+                              <Trash2 size={16} color="var(--danger)" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Modal for Create and Edit */}
@@ -273,8 +410,12 @@ export const InventoryListPage: React.FC = () => {
         onClose={() => setModalOpen(false)}
         title={editingItem ? `Edit Asset: ${editingItem.assetNumber}` : 'Register New Hardware Asset'}
       >
-        {formError && <div style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{formError}</div>}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {formError && (
+          <div style={{ color: 'var(--danger)', backgroundColor: '#FEF2F2', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-md)', fontSize: '0.825rem', marginBottom: '1rem', border: '1px solid #FECACA' }}>
+            {formError}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
           <Input
             label="Asset Number (Primary Key)"
             required
@@ -284,43 +425,96 @@ export const InventoryListPage: React.FC = () => {
             placeholder="e.g. AST-LPT-001"
             helperText={editingItem ? 'Asset number cannot be changed' : undefined}
           />
-          <Input
-            label="Item Name"
-            required
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="e.g. ThinkPad T14s Gen 3"
-          />
-          <Input
-            label="Brand / Manufacturer"
-            value={formData.brand}
-            onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-            placeholder="e.g. Lenovo"
-          />
-          <div>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>Category *</label>
-            <select
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <Input
+              label="Item Name"
               required
-              value={formData.categoryId}
-              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-              style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginTop: '0.25rem' }}
-            >
-              <option value="">Select Category</option>
-              {categories.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-            </select>
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="e.g. ThinkPad T14s"
+            />
+            <Input
+              label="Brand / Manufacturer"
+              value={formData.brand}
+              onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+              placeholder="e.g. Lenovo"
+            />
           </div>
-          <Input
-            label="Serial Number (Optional)"
-            value={formData.serialNumber}
-            onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
-            placeholder="e.g. SN-982347-XYZ"
-          />
-          <Input
-            label="Assigned Person (Name only)"
-            value={formData.assignedTo}
-            onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-            placeholder="e.g. Budi Santoso"
-          />
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div>
+              <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '0.35rem' }}>
+                Category *
+              </label>
+              <select
+                required
+                value={formData.categoryId}
+                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '0.55rem 0.85rem',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border)',
+                  backgroundColor: '#FFFFFF',
+                  color: 'var(--text-main)',
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                  boxShadow: 'var(--shadow-xs)'
+                }}
+              >
+                <option value="">Select Category</option>
+                {categories.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+              </select>
+            </div>
+            <Input
+              label="Serial Number (Optional)"
+              value={formData.serialNumber}
+              onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
+              placeholder="e.g. SN-982347-XYZ"
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <Input
+              label="Assigned Person"
+              value={formData.assignedTo}
+              onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+              placeholder="e.g. Budi Santoso"
+            />
+            <Input
+              label="Purchase Month"
+              type="month"
+              required
+              value={formData.purchaseMonth}
+              onChange={(e) => setFormData({ ...formData, purchaseMonth: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '0.35rem' }}>
+              Description / Specifications (Optional)
+            </label>
+            <textarea
+              rows={3}
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="e.g. Intel Core i7, 16GB RAM, 512GB SSD, Condition: Brand New"
+              style={{
+                width: '100%',
+                padding: '0.55rem 0.85rem',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border)',
+                backgroundColor: '#FFFFFF',
+                color: 'var(--text-main)',
+                fontSize: '0.875rem',
+                outline: 'none',
+                boxShadow: 'var(--shadow-xs)',
+                fontFamily: 'inherit',
+                resize: 'vertical'
+              }}
+            />
+          </div>
+
           <Input
             label="Device Password"
             type="password"
@@ -328,14 +522,8 @@ export const InventoryListPage: React.FC = () => {
             onChange={(e) => setFormData({ ...formData, devicePassword: e.target.value })}
             placeholder={editingItem ? 'Enter new device password or leave unchanged' : 'Optional password'}
           />
-          <Input
-            label="Purchase Month (YYYY-MM)"
-            type="month"
-            required
-            value={formData.purchaseMonth}
-            onChange={(e) => setFormData({ ...formData, purchaseMonth: e.target.value })}
-          />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.65rem', marginTop: '0.5rem' }}>
             <Button variant="outline" type="button" onClick={() => setModalOpen(false)}>Cancel</Button>
             <Button variant="primary" type="submit" isLoading={saving}>
               {editingItem ? 'Save Changes' : 'Create Asset'}

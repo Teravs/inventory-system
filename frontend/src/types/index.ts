@@ -31,6 +31,7 @@ export interface InventoryItem {
   categoryId: number | string;
   assignedTo: string | null;
   devicePassword?: string | null;
+  description?: string | null;
   purchaseMonth: string;
   qrCode: string;
   status: Status;

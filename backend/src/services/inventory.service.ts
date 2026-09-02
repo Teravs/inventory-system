@@ -19,6 +19,7 @@ interface CreateInventoryDTO {
   categoryId: number | string;
   assignedTo?: string | null;
   devicePassword?: string | null;
+  description?: string | null;
   purchaseMonth: string;
 }
 
@@ -42,7 +43,8 @@ export class InventoryService {
         { name: { contains: params.search } },
         { brand: { contains: params.search } },
         { serialNumber: { contains: params.search } },
-        { assignedTo: { contains: params.search } }
+        { assignedTo: { contains: params.search } },
+        { description: { contains: params.search } }
       ];
     }
 
@@ -125,6 +127,7 @@ export class InventoryService {
         categoryId: numericCategoryId,
         assignedTo: dto.assignedTo || null,
         devicePassword: dto.devicePassword || null,
+        description: dto.description || null,
         purchaseMonth: dto.purchaseMonth,
         qrCode: qrUrl,
         status: InventoryStatus.ACTIVE,
@@ -178,6 +181,7 @@ export class InventoryService {
         categoryId: targetCategoryId,
         assignedTo: dto.assignedTo !== undefined ? dto.assignedTo : oldItem.assignedTo,
         devicePassword: dto.devicePassword !== undefined ? dto.devicePassword : oldItem.devicePassword,
+        description: dto.description !== undefined ? dto.description : (oldItem as any).description,
         purchaseMonth: dto.purchaseMonth || oldItem.purchaseMonth,
         updatedById: numericUserId
       },

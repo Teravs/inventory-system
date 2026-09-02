@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../services/api';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
-import { Boxes, Lock } from 'lucide-react';
+import { Layers, Lock } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -37,7 +37,8 @@ export const LoginPage: React.FC = () => {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: 'var(--bg-page)',
+        backgroundColor: '#0F172A',
+        backgroundImage: 'radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.18) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(147, 51, 234, 0.15) 0px, transparent 50%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -47,35 +48,65 @@ export const LoginPage: React.FC = () => {
       <div
         style={{
           width: '100%',
-          maxWidth: '400px',
-          backgroundColor: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '2rem',
-          boxShadow: 'var(--shadow-md)'
+          maxWidth: '420px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: 'var(--radius-xl)',
+          padding: '2.5rem 2rem',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'inline-flex', padding: '0.75rem', backgroundColor: '#EFF6FF', borderRadius: '50%', color: 'var(--primary)', marginBottom: '0.5rem' }}>
-            <Boxes size={32} />
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              padding: '0.85rem',
+              background: 'var(--primary-gradient)',
+              borderRadius: '14px',
+              color: '#FFFFFF',
+              marginBottom: '1rem',
+              boxShadow: '0 10px 15px -3px rgba(37, 99, 235, 0.35)'
+            }}
+          >
+            <Layers size={32} />
           </div>
-          <h1 style={{ fontSize: '1.35rem', fontWeight: 700 }}>Internal Inventory</h1>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-sub)' }}>Sign in to access company asset database</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
+            CHA Asset
+          </h1>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-sub)' }}>
+            Internal Company Inventory Management
+          </p>
         </div>
 
         {error && (
-          <div style={{ padding: '0.75rem', backgroundColor: '#FEF2F2', border: '1px solid #FCA5A5', color: '#991B1B', borderRadius: 'var(--radius-md)', fontSize: '0.85rem', marginBottom: '1rem' }}>
-            {error}
+          <div
+            style={{
+              padding: '0.75rem 1rem',
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FECACA',
+              color: '#991B1B',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.825rem',
+              fontWeight: 500,
+              marginBottom: '1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <span>⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
           <Input
             label="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
             autoFocus
+            placeholder="Enter username"
           />
           <Input
             label="Password"
@@ -83,11 +114,22 @@ export const LoginPage: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            placeholder="••••••••"
           />
-          <Button type="submit" variant="primary" size="lg" isLoading={loading} style={{ width: '100%', marginTop: '0.5rem' }}>
-            <Lock size={18} /> Sign In
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            isLoading={loading}
+            style={{ width: '100%', marginTop: '0.5rem', padding: '0.75rem' }}
+          >
+            <Lock size={17} /> Sign In
           </Button>
         </form>
+
+        <div style={{ marginTop: '2rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          Secured Internal Authentication & Audit System
+        </div>
       </div>
     </div>
   );

@@ -21,34 +21,83 @@ export const Button: React.FC<ButtonProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       gap: '0.5rem',
-      fontWeight: 500,
+      fontWeight: 600,
       borderRadius: 'var(--radius-md)',
       border: '1px solid transparent',
       cursor: disabled || isLoading ? 'not-allowed' : 'pointer',
-      opacity: disabled || isLoading ? 0.6 : 1,
-      transition: 'background-color 0.15s ease, border-color 0.15s ease',
-      fontSize: size === 'sm' ? '0.875rem' : size === 'lg' ? '1.125rem' : '1rem',
-      padding: size === 'sm' ? '0.375rem 0.75rem' : size === 'lg' ? '0.75rem 1.5rem' : '0.5rem 1rem'
+      opacity: disabled || isLoading ? 0.65 : 1,
+      transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+      fontSize: size === 'sm' ? '0.8125rem' : size === 'lg' ? '1rem' : '0.875rem',
+      padding: size === 'sm' ? '0.4rem 0.85rem' : size === 'lg' ? '0.75rem 1.5rem' : '0.55rem 1.15rem',
+      boxShadow: variant === 'primary' ? '0 1px 2px 0 rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.15)' : 'var(--shadow-xs)',
+      userSelect: 'none'
     };
 
     if (variant === 'primary') {
-      return { ...base, backgroundColor: 'var(--primary)', color: '#FFFFFF', ...style };
+      return {
+        ...base,
+        background: 'var(--primary-gradient)',
+        color: '#FFFFFF',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        ...style
+      };
     }
     if (variant === 'secondary') {
-      return { ...base, backgroundColor: 'var(--secondary)', color: '#FFFFFF', ...style };
+      return {
+        ...base,
+        backgroundColor: 'var(--secondary)',
+        color: '#FFFFFF',
+        ...style
+      };
     }
     if (variant === 'danger') {
-      return { ...base, backgroundColor: 'var(--danger)', color: '#FFFFFF', ...style };
+      return {
+        ...base,
+        backgroundColor: '#EF4444',
+        color: '#FFFFFF',
+        boxShadow: '0 1px 2px 0 rgba(239, 68, 68, 0.25)',
+        ...style
+      };
     }
     if (variant === 'outline') {
-      return { ...base, backgroundColor: 'transparent', borderColor: 'var(--border)', color: 'var(--text-main)', ...style };
+      return {
+        ...base,
+        backgroundColor: '#FFFFFF',
+        borderColor: 'var(--border)',
+        color: 'var(--text-main)',
+        boxShadow: 'var(--shadow-xs)',
+        ...style
+      };
     }
-    return { ...base, backgroundColor: 'transparent', color: 'var(--text-main)', ...style };
+    return {
+      ...base,
+      backgroundColor: 'transparent',
+      color: 'var(--text-main)',
+      boxShadow: 'none',
+      ...style
+    };
   };
 
   return (
     <button style={getStyles()} disabled={disabled || isLoading} {...props}>
-      {isLoading ? <span>Loading...</span> : children}
+      {isLoading ? (
+        <>
+          <span
+            style={{
+              width: '14px',
+              height: '14px',
+              border: '2px solid rgba(255,255,255,0.4)',
+              borderTopColor: '#FFFFFF',
+              borderRadius: '50%',
+              display: 'inline-block',
+              animation: 'spin 0.6s linear infinite'
+            }}
+          />
+          <span>Loading...</span>
+        </>
+      ) : (
+        children
+      )}
     </button>
   );
 };

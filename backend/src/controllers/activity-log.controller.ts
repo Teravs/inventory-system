@@ -6,12 +6,17 @@ import { ActivityAction } from '../types/index.js';
 export class ActivityLogController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await ActivityLogService.getLogs({
-        page: req.query.page ? Number(req.query.page) : undefined,
-        limit: req.query.limit ? Number(req.query.limit) : undefined,
-        action: req.query.action as ActivityAction,
-        entityType: req.query.entityType as string
-      });
+      const result = await ActivityLogService.getLogs(
+        {
+          page: req.query.page ? Number(req.query.page) : undefined,
+          limit: req.query.limit ? Number(req.query.limit) : undefined,
+          action: req.query.action as ActivityAction,
+          entityType: req.query.entityType as string,
+          month: req.query.month as string,
+          all: req.query.all === 'true'
+        },
+        req.user!.role
+      );
 
       sendSuccess(res, 'Activity logs retrieved', result.logs, 200, result.meta);
     } catch (err) {

@@ -1,5 +1,5 @@
 import { prisma } from '../config/prisma.js';
-import { ActivityAction } from '../types/index.js';
+import { ActivityAction, UserRole } from '../types/index.js';
 
 interface CreateLogParams {
   userId: number;
@@ -45,19 +45,50 @@ export class ActivityLogService {
     }
   }
 
-  static async getLogs(query: {
-    page?: number;
-    limit?: number;
-    action?: ActivityAction;
-    entityType?: string;
-  }) {
-    const page = Math.max(1, Number(query.page) || 1);
-    const limit = Math.min(100, Math.max(1, Number(query.limit) || 20));
+  static async getLogs(
+    query: {
+      page?: number;
+      limit?: number;
+      action?: ActivityAction;
+      entityType?: string;
+      month?: string;
+      all?: boolean;
+    },
+    userRole: UserRole
+  ) {
+    const isAll = Boolean(query.all) || Number(query.limit) >= 1000;
+    const page = isAll ? 1 : Math.max(1, Number(query.page) || 1);
+    const limit = isAll ? 5000 : Math.min(500, Math.max(1, Number(query.limit) || 20));
     const skip = (page - 1) * limit;
 
-    const where: { action?: ActivityAction; entityType?: string } = {};
-    if (query.action) where.action = query.action;
-    if (query.entityType) where.entityType = query.entityType;
+    const where: Record<string, unknown> = {};
+
+    // Role-based security: ADMIN is restricted to INVENTORY only, SUPER_ADMIN can view all
+    if (userRole !== UserRole.SUPER_ADMIN) {
+      where.entityType = 'INVENTORY';
+      if (query.action && query.action !== ActivityAction.CHANGE_ROLE) {
+        where.action = query.action;
+      }
+    } else {
+      if (query.action) where.action = query.action;
+      if (query.entityType) where.entityType = query.entityType;
+    }
+
+    if (query.month) {
+      const parts = query.month.split('-');
+      if (parts.length === 2) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10);
+        if (!isNaN(year) && !isNaN(month)) {
+          const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+          const endDate = new Date(year, month, 1, 0, 0, 0, 0);
+          where.createdAt = {
+            gte: startDate,
+            lt: endDate
+          };
+        }
+      }
+    }
 
     const [total, rawLogs] = await Promise.all([
       prisma.activityLog.count({ where }),

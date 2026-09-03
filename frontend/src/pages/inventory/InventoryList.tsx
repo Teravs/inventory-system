@@ -479,7 +479,7 @@ export const InventoryListPage: React.FC = () => {
               label="Assigned Person"
               value={formData.assignedTo}
               onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-              placeholder="e.g. Budi Santoso"
+              placeholder="e.g. Sachio Devana"
             />
             <Input
               label="Purchase Month"

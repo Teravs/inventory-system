@@ -6,6 +6,7 @@ import { Input } from '../../components/common/Input';
 import { Modal } from '../../components/common/Modal';
 import { Badge } from '../../components/common/Badge';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
+import { FeedbackModal } from '../../components/common/FeedbackModal';
 import { Plus, Edit, Trash2, Power, Users } from 'lucide-react';
 
 export const UserListPage: React.FC = () => {
@@ -14,6 +15,21 @@ export const UserListPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
+  const [statusTarget, setStatusTarget] = useState<{ user: User; nextStatus: Status } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  // Feedback Notification Modal State
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: ''
+  });
 
   const [formData, setFormData] = useState({
     name: '',
@@ -83,9 +99,17 @@ export const UserListPage: React.FC = () => {
           payload.password = formData.password.trim();
         }
         await api.put(`/users/${editingUser.id}`, payload);
+        setModalOpen(false);
+        fetchUsers();
+        setFeedback({
+          isOpen: true,
+          type: 'success',
+          title: 'Akun Berhasil Diperbarui',
+          message: `Perubahan profil akun @${formData.username.trim()} (${formData.name.trim()}) telah berhasil disimpan.`
+        });
       } else {
         if (!formData.password.trim()) {
-          setError('Password is required for new users.');
+          setError('Password wajib diisi untuk pembuatan akun baru.');
           setSaving(false);
           return;
         }
@@ -95,34 +119,86 @@ export const UserListPage: React.FC = () => {
           password: formData.password.trim(),
           role: formData.role
         });
+        setModalOpen(false);
+        fetchUsers();
+        setFeedback({
+          isOpen: true,
+          type: 'success',
+          title: 'Akun Pengguna Dibuat',
+          message: `Akun baru @${formData.username.trim()} (${formData.name.trim()}) dengan role ${formData.role} berhasil dibuat.`
+        });
       }
-      setModalOpen(false);
-      fetchUsers();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to save user account');
+      const errMsg = err.response?.data?.message || 'Gagal menyimpan data akun pengguna.';
+      setError(errMsg);
+      setFeedback({
+        isOpen: true,
+        type: 'error',
+        title: 'Gagal Menyimpan Akun',
+        message: errMsg
+      });
     } finally {
       setSaving(false);
     }
   };
 
-  const toggleStatus = async (u: User) => {
+  const openStatusConfirm = (u: User) => {
     const nextStatus: Status = u.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    setStatusTarget({ user: u, nextStatus });
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!statusTarget) return;
+    setActionLoading(true);
     try {
-      await api.patch(`/users/${u.id}/status`, { status: nextStatus });
+      await api.patch(`/users/${statusTarget.user.id}/status`, { status: statusTarget.nextStatus });
+      const changedUser = statusTarget.user;
+      const appliedStatus = statusTarget.nextStatus;
+      setStatusTarget(null);
       fetchUsers();
-    } catch (err) {
-      console.error(err);
+      setFeedback({
+        isOpen: true,
+        type: appliedStatus === 'ACTIVE' ? 'success' : 'warning',
+        title: appliedStatus === 'ACTIVE' ? 'Akun Berhasil Diaktifkan' : 'Akun Dinonaktifkan',
+        message: `Status akun @${changedUser.username} (${changedUser.name}) berhasil diubah menjadi ${appliedStatus}.`
+      });
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || 'Gagal mengubah status akun.';
+      setFeedback({
+        isOpen: true,
+        type: 'error',
+        title: 'Gagal Mengubah Status',
+        message: errMsg
+      });
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
+    setActionLoading(true);
     try {
       await api.delete(`/users/${deleteTarget.id}`);
+      const deletedUser = deleteTarget;
       setDeleteTarget(null);
       fetchUsers();
-    } catch (err) {
-      console.error(err);
+      setFeedback({
+        isOpen: true,
+        type: 'success',
+        title: 'Akun Pengguna Dihapus',
+        message: `Akun pengguna @${deletedUser.username} (${deletedUser.name}) telah berhasil dihapus permanen.`
+      });
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || 'Gagal menghapus akun pengguna.';
+      setFeedback({
+        isOpen: true,
+        type: 'error',
+        title: 'Gagal Menghapus Akun',
+        message: errMsg
+      });
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -225,8 +301,8 @@ export const UserListPage: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => toggleStatus(u)}
-                          title="Toggle status"
+                          onClick={() => openStatusConfirm(u)}
+                          title={u.status === 'ACTIVE' ? 'Nonaktifkan akun' : 'Aktifkan akun'}
                           style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
                         >
                           <Power size={16} color={u.status === 'ACTIVE' ? 'var(--warning)' : 'var(--success)'} />
@@ -339,12 +415,43 @@ export const UserListPage: React.FC = () => {
         </form>
       </Modal>
 
+      {/* Confirmation Modal for Permanent Delete User */}
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        title="Permanently Delete User"
-        message={`Are you sure you want to delete user @${deleteTarget?.username}? This action is irreversible and recorded in the audit trail.`}
+        variant="danger"
+        title="Konfirmasi Hapus Akun"
+        message={`Apakah Anda yakin ingin menghapus akun @${deleteTarget?.username} (${deleteTarget?.name}) secara permanen?\n\nTindakan ini tidak dapat dibatalkan dan akan dicatat dalam Audit Trail.`}
+        confirmText="Ya, Hapus Akun"
+        cancelText="Batal"
+        isLoading={actionLoading}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
+      />
+
+      {/* Confirmation Modal for User Status Toggle */}
+      <ConfirmDialog
+        isOpen={!!statusTarget}
+        variant="warning"
+        title={statusTarget?.nextStatus === 'ACTIVE' ? 'Konfirmasi Aktivasi Akun' : 'Konfirmasi Nonaktifkan Akun'}
+        message={
+          statusTarget?.nextStatus === 'ACTIVE'
+            ? `Apakah Anda yakin ingin mengaktifkan kembali akun @${statusTarget?.user.username} (${statusTarget?.user.name})? Pengguna akan dapat login kembali.`
+            : `Apakah Anda yakin ingin menonaktifkan akun @${statusTarget?.user.username} (${statusTarget?.user.name})? Pengguna tidak akan dapat mengakses sistem.`
+        }
+        confirmText={statusTarget?.nextStatus === 'ACTIVE' ? 'Ya, Aktifkan' : 'Ya, Nonaktifkan'}
+        cancelText="Batal"
+        isLoading={actionLoading}
+        onConfirm={handleConfirmStatusChange}
+        onCancel={() => setStatusTarget(null)}
+      />
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        type={feedback.type}
+        title={feedback.title}
+        message={feedback.message}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
       />
     </div>
   );

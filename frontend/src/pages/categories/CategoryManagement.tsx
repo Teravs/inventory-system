@@ -5,6 +5,8 @@ import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Modal } from '../../components/common/Modal';
 import { Badge } from '../../components/common/Badge';
+import { ConfirmDialog } from '../../components/common/ConfirmDialog';
+import { FeedbackModal } from '../../components/common/FeedbackModal';
 import { Plus, Power, Edit, Tags } from 'lucide-react';
 
 export const CategoryListPage: React.FC = () => {
@@ -15,6 +17,21 @@ export const CategoryListPage: React.FC = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Confirmation & Feedback State
+  const [statusTarget, setStatusTarget] = useState<{ category: Category; nextStatus: Status } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: ''
+  });
 
   const fetchCategories = async () => {
     try {
@@ -39,27 +56,75 @@ export const CategoryListPage: React.FC = () => {
     try {
       if (editingCategory) {
         await api.put(`/categories/${editingCategory.id}`, { name: name.trim() });
+        setModalOpen(false);
+        const categoryName = name.trim();
+        setName('');
+        setEditingCategory(null);
+        fetchCategories();
+        setFeedback({
+          isOpen: true,
+          type: 'success',
+          title: 'Kategori Berhasil Diperbarui',
+          message: `Nama kategori telah berhasil diubah menjadi "${categoryName}".`
+        });
       } else {
         await api.post('/categories', { name: name.trim() });
+        setModalOpen(false);
+        const categoryName = name.trim();
+        setName('');
+        setEditingCategory(null);
+        fetchCategories();
+        setFeedback({
+          isOpen: true,
+          type: 'success',
+          title: 'Kategori Berhasil Dibuat',
+          message: `Kategori baru "${categoryName}" berhasil ditambahkan ke sistem.`
+        });
       }
-      setModalOpen(false);
-      setName('');
-      setEditingCategory(null);
-      fetchCategories();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to save category');
+      const errMsg = err.response?.data?.message || 'Gagal menyimpan data kategori.';
+      setError(errMsg);
+      setFeedback({
+        isOpen: true,
+        type: 'error',
+        title: 'Gagal Menyimpan Kategori',
+        message: errMsg
+      });
     } finally {
       setSaving(false);
     }
   };
 
-  const toggleStatus = async (category: Category) => {
+  const openStatusConfirm = (category: Category) => {
     const nextStatus: Status = category.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    setStatusTarget({ category, nextStatus });
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!statusTarget) return;
+    setActionLoading(true);
     try {
-      await api.patch(`/categories/${category.id}/status`, { status: nextStatus });
+      await api.patch(`/categories/${statusTarget.category.id}/status`, { status: statusTarget.nextStatus });
+      const changedCat = statusTarget.category;
+      const appliedStatus = statusTarget.nextStatus;
+      setStatusTarget(null);
       fetchCategories();
-    } catch (err) {
-      console.error(err);
+      setFeedback({
+        isOpen: true,
+        type: appliedStatus === 'ACTIVE' ? 'success' : 'warning',
+        title: appliedStatus === 'ACTIVE' ? 'Kategori Diaktifkan' : 'Kategori Dinonaktifkan',
+        message: `Status kategori "${changedCat.name}" berhasil diubah menjadi ${appliedStatus}.`
+      });
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || 'Gagal mengubah status kategori.';
+      setFeedback({
+        isOpen: true,
+        type: 'error',
+        title: 'Gagal Mengubah Status',
+        message: errMsg
+      });
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -158,8 +223,8 @@ export const CategoryListPage: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => toggleStatus(c)}
-                          title="Toggle Status"
+                          onClick={() => openStatusConfirm(c)}
+                          title={c.status === 'ACTIVE' ? 'Nonaktifkan kategori' : 'Aktifkan kategori'}
                           style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
                         >
                           <Power size={16} color={c.status === 'ACTIVE' ? 'var(--warning)' : 'var(--success)'} />
@@ -174,6 +239,7 @@ export const CategoryListPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Modal for Create/Edit */}
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editingCategory ? 'Edit Category' : 'Create Category'}>
         {error && (
           <div style={{ color: 'var(--danger)', backgroundColor: '#FEF2F2', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-md)', fontSize: '0.825rem', marginBottom: '1rem', border: '1px solid #FECACA' }}>
@@ -195,6 +261,32 @@ export const CategoryListPage: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Confirmation Modal for Status Toggle */}
+      <ConfirmDialog
+        isOpen={!!statusTarget}
+        variant="warning"
+        title={statusTarget?.nextStatus === 'ACTIVE' ? 'Konfirmasi Aktivasi Kategori' : 'Konfirmasi Nonaktifkan Kategori'}
+        message={
+          statusTarget?.nextStatus === 'ACTIVE'
+            ? `Apakah Anda yakin ingin mengaktifkan kategori "${statusTarget?.category.name}"?\n\nKategori ini akan kembali dapat dipilih saat mendaftarkan barang baru.`
+            : `Apakah Anda yakin ingin menonaktifkan kategori "${statusTarget?.category.name}"?\n\nKategori yang nonaktif tidak dapat dipilih untuk barang baru.`
+        }
+        confirmText={statusTarget?.nextStatus === 'ACTIVE' ? 'Ya, Aktifkan' : 'Ya, Nonaktifkan'}
+        cancelText="Batal"
+        isLoading={actionLoading}
+        onConfirm={handleConfirmStatusChange}
+        onCancel={() => setStatusTarget(null)}
+      />
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        type={feedback.type}
+        title={feedback.title}
+        message={feedback.message}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+      />
     </div>
   );
 };

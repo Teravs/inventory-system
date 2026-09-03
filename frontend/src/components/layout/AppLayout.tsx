@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { Menu, Layers } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -47,21 +47,17 @@ export const AppLayout: React.FC = () => {
               <Menu size={20} />
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <div
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+              <img
+                src="/logo.png"
+                alt="CHA Asset Logo"
                 style={{
-                  width: '30px',
-                  height: '30px',
-                  borderRadius: '8px',
-                  background: 'var(--primary-gradient)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF'
+                  width: '32px',
+                  height: '32px',
+                  objectFit: 'contain',
+                  borderRadius: '6px'
                 }}
-              >
-                <Layers size={16} />
-              </div>
+              />
               <span style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
                 CHA Asset
               </span>

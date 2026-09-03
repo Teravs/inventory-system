@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../services/api';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
-import { Layers, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -57,24 +57,23 @@ export const LoginPage: React.FC = () => {
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              padding: '0.85rem',
-              background: 'var(--primary-gradient)',
-              borderRadius: '14px',
-              color: '#FFFFFF',
-              marginBottom: '1rem',
-              boxShadow: '0 10px 15px -3px rgba(37, 99, 235, 0.35)'
-            }}
-          >
-            <Layers size={32} />
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.85rem' }}>
+            <img
+              src="/logo.png"
+              alt="CHA Asset Logo"
+              style={{
+                width: '64px',
+                height: '64px',
+                objectFit: 'contain',
+                borderRadius: '12px'
+              }}
+            />
           </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
             CHA Asset
           </h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-sub)' }}>
-            Internal Company Inventory Management
+          <p style={{ color: 'var(--text-sub)', fontSize: '0.875rem' }}>
+            Internal Hardware & Asset Control Portal
           </p>
         </div>
 
@@ -84,52 +83,49 @@ export const LoginPage: React.FC = () => {
               padding: '0.75rem 1rem',
               backgroundColor: '#FEF2F2',
               border: '1px solid #FECACA',
-              color: '#991B1B',
+              color: 'var(--danger)',
               borderRadius: 'var(--radius-md)',
-              fontSize: '0.825rem',
-              fontWeight: 500,
-              marginBottom: '1.25rem',
+              fontSize: '0.875rem',
+              marginBottom: '1.5rem',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem'
             }}
           >
-            <span>⚠️</span>
-            <span>{error}</span>
+            {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <Input
             label="Username"
+            required
+            autoComplete="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            required
-            autoFocus
-            placeholder="Enter username"
+            placeholder="superadmin"
           />
+
           <Input
             label="Password"
             type="password"
+            required
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="••••••••"
+            placeholder="••••••••••••"
           />
+
           <Button
             type="submit"
             variant="primary"
             size="lg"
             isLoading={loading}
-            style={{ width: '100%', marginTop: '0.5rem', padding: '0.75rem' }}
+            style={{ marginTop: '0.5rem' }}
           >
-            <Lock size={17} /> Sign In
+            <Lock size={16} /> Sign In
           </Button>
         </form>
-
-        <div style={{ marginTop: '2rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          Secured Internal Authentication & Audit System
-        </div>
       </div>
     </div>
   );

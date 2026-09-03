@@ -8,6 +8,7 @@ import { Input } from '../../components/common/Input';
 import { Badge } from '../../components/common/Badge';
 import { Modal } from '../../components/common/Modal';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
+import { FeedbackModal } from '../../components/common/FeedbackModal';
 import { Plus, Search, Eye, Edit2, Power, Trash2, Boxes } from 'lucide-react';
 
 export const InventoryListPage: React.FC = () => {
@@ -23,10 +24,25 @@ export const InventoryListPage: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Dialog State
+  // Dialog & Modal State
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<InventoryItem | null>(null);
+  const [statusTarget, setStatusTarget] = useState<{ item: InventoryItem; nextStatus: Status } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  // Feedback Notification Modal State
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: ''
+  });
 
   // Form State
   const [formData, setFormData] = useState({
@@ -127,6 +143,14 @@ export const InventoryListPage: React.FC = () => {
           description: formData.description.trim() || null,
           purchaseMonth: formData.purchaseMonth
         });
+        setModalOpen(false);
+        fetchItems();
+        setFeedback({
+          isOpen: true,
+          type: 'success',
+          title: 'Perubahan Berhasil Disimpan',
+          message: `Data barang "${formData.name}" (${editingItem.assetNumber}) telah berhasil diperbarui.`
+        });
       } else {
         await api.post('/inventory', {
           assetNumber: formData.assetNumber.trim(),
@@ -139,34 +163,86 @@ export const InventoryListPage: React.FC = () => {
           description: formData.description.trim() || null,
           purchaseMonth: formData.purchaseMonth
         });
+        setModalOpen(false);
+        fetchItems();
+        setFeedback({
+          isOpen: true,
+          type: 'success',
+          title: 'Barang Berhasil Didaftarkan',
+          message: `Barang "${formData.name}" dengan kode aset ${formData.assetNumber.trim()} berhasil didaftarkan ke sistem.`
+        });
       }
-      setModalOpen(false);
-      fetchItems();
     } catch (err: any) {
-      setFormError(err.response?.data?.message || 'Failed to save inventory item');
+      const errMsg = err.response?.data?.message || 'Gagal menyimpan data barang.';
+      setFormError(errMsg);
+      setFeedback({
+        isOpen: true,
+        type: 'error',
+        title: 'Gagal Menyimpan Data',
+        message: errMsg
+      });
     } finally {
       setSaving(false);
     }
   };
 
-  const toggleStatus = async (assetNumber: string, currentStatus: Status) => {
-    const nextStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+  const openStatusConfirm = (item: InventoryItem) => {
+    const nextStatus: Status = item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    setStatusTarget({ item, nextStatus });
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!statusTarget) return;
+    setActionLoading(true);
     try {
-      await api.patch(`/inventory/${assetNumber}/status`, { status: nextStatus });
+      await api.patch(`/inventory/${statusTarget.item.assetNumber}/status`, { status: statusTarget.nextStatus });
+      const changedItem = statusTarget.item;
+      const appliedStatus = statusTarget.nextStatus;
+      setStatusTarget(null);
       fetchItems();
-    } catch (err) {
-      console.error(err);
+      setFeedback({
+        isOpen: true,
+        type: appliedStatus === 'ACTIVE' ? 'success' : 'warning',
+        title: appliedStatus === 'ACTIVE' ? 'Barang Berhasil Diaktifkan' : 'Barang Dinonaktifkan',
+        message: `Status barang "${changedItem.name}" (${changedItem.assetNumber}) berhasil diubah menjadi ${appliedStatus}.`
+      });
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || 'Gagal mengubah status barang.';
+      setFeedback({
+        isOpen: true,
+        type: 'error',
+        title: 'Gagal Mengubah Status',
+        message: errMsg
+      });
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const handlePermanentDelete = async () => {
     if (!deleteTarget) return;
+    setActionLoading(true);
     try {
-      await api.delete(`/inventory/${deleteTarget}`);
+      await api.delete(`/inventory/${deleteTarget.assetNumber}`);
+      const deletedItem = deleteTarget;
       setDeleteTarget(null);
       fetchItems();
-    } catch (err) {
-      console.error(err);
+      setFeedback({
+        isOpen: true,
+        type: 'success',
+        title: 'Barang Berhasil Dihapus',
+        message: `Data aset "${deletedItem.name}" (${deletedItem.assetNumber}) telah dihapus secara permanen dari sistem.`
+      });
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || 'Gagal menghapus data barang.';
+      setFeedback({
+        isOpen: true,
+        type: 'error',
+        title: 'Gagal Menghapus Barang',
+        message: errMsg
+      });
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -377,8 +453,8 @@ export const InventoryListPage: React.FC = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => toggleStatus(item.assetNumber, item.status)}
-                              title="Toggle status"
+                              onClick={() => openStatusConfirm(item)}
+                              title={item.status === 'ACTIVE' ? 'Nonaktifkan barang' : 'Aktifkan barang'}
                               style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
                             >
                               <Power size={16} color={item.status === 'ACTIVE' ? 'var(--warning)' : 'var(--success)'} />
@@ -386,7 +462,7 @@ export const InventoryListPage: React.FC = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => setDeleteTarget(item.assetNumber)}
+                              onClick={() => setDeleteTarget(item)}
                               title="Delete item"
                               style={{ padding: '0.35rem', borderRadius: 'var(--radius-sm)' }}
                             >
@@ -479,7 +555,7 @@ export const InventoryListPage: React.FC = () => {
               label="Assigned Person"
               value={formData.assignedTo}
               onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-              placeholder="e.g. Sachio Devana"
+              placeholder="e.g. Budi Santoso"
             />
             <Input
               label="Purchase Month"
@@ -532,12 +608,43 @@ export const InventoryListPage: React.FC = () => {
         </form>
       </Modal>
 
+      {/* Confirmation Modal for Permanent Delete */}
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        title="Permanently Delete Inventory Item"
-        message={`Are you sure you want to permanently delete asset "${deleteTarget}"? This will be permanently removed and logged.`}
+        variant="danger"
+        title="Konfirmasi Hapus Permanen"
+        message={`Apakah Anda yakin ingin menghapus permanen aset "${deleteTarget?.name}" (${deleteTarget?.assetNumber})?\n\nTindakan ini bersifat permanen, tidak dapat dibatalkan, dan akan dicatat dalam Audit Trail.`}
+        confirmText="Ya, Hapus Permanen"
+        cancelText="Batal"
+        isLoading={actionLoading}
         onConfirm={handlePermanentDelete}
         onCancel={() => setDeleteTarget(null)}
+      />
+
+      {/* Confirmation Modal for Status Activation / Deactivation */}
+      <ConfirmDialog
+        isOpen={!!statusTarget}
+        variant="warning"
+        title={statusTarget?.nextStatus === 'ACTIVE' ? 'Konfirmasi Aktivasi Barang' : 'Konfirmasi Nonaktifkan Barang'}
+        message={
+          statusTarget?.nextStatus === 'ACTIVE'
+            ? `Apakah Anda yakin ingin mengaktifkan kembali aset "${statusTarget?.item.name}" (${statusTarget?.item.assetNumber})?`
+            : `Apakah Anda yakin ingin menonaktifkan aset "${statusTarget?.item.name}" (${statusTarget?.item.assetNumber})?\n\nBarang yang nonaktif tidak akan muncul sebagai unit aktif operasional.`
+        }
+        confirmText={statusTarget?.nextStatus === 'ACTIVE' ? 'Ya, Aktifkan' : 'Ya, Nonaktifkan'}
+        cancelText="Batal"
+        isLoading={actionLoading}
+        onConfirm={handleConfirmStatusChange}
+        onCancel={() => setStatusTarget(null)}
+      />
+
+      {/* Reusable Feedback Notification Modal */}
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        type={feedback.type}
+        title={feedback.title}
+        message={feedback.message}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
       />
     </div>
   );

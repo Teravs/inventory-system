@@ -8,6 +8,7 @@ import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Modal } from '../../components/common/Modal';
+import { FeedbackModal } from '../../components/common/FeedbackModal';
 import { 
   ArrowLeft, 
   Eye, 
@@ -46,6 +47,19 @@ export const InventoryDetailPage: React.FC = () => {
   });
   const [editError, setEditError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Feedback Notification Modal
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: ''
+  });
 
   const fetchDetail = async () => {
     try {
@@ -107,8 +121,21 @@ export const InventoryDetailPage: React.FC = () => {
       });
       setEditModalOpen(false);
       fetchDetail();
+      setFeedback({
+        isOpen: true,
+        type: 'success',
+        title: 'Spesifikasi Berhasil Diperbarui',
+        message: `Perubahan data spesifikasi pada aset "${editFormData.name}" (${item.assetNumber}) telah berhasil disimpan.`
+      });
     } catch (err: any) {
-      setEditError(err.response?.data?.message || 'Failed to update asset');
+      const errMsg = err.response?.data?.message || 'Gagal memperbarui data aset.';
+      setEditError(errMsg);
+      setFeedback({
+        isOpen: true,
+        type: 'error',
+        title: 'Gagal Memperbarui Aset',
+        message: errMsg
+      });
     } finally {
       setSaving(false);
     }
@@ -347,6 +374,15 @@ export const InventoryDetailPage: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        type={feedback.type}
+        title={feedback.title}
+        message={feedback.message}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+      />
     </div>
   );
 };

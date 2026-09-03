@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { ConfirmDialog } from '../common/ConfirmDialog';
 import { 
   LayoutDashboard, 
   Boxes, 
@@ -9,8 +10,7 @@ import {
   Users, 
   FileText, 
   LogOut,
-  X,
-  Layers
+  X
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -20,6 +20,8 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const navItems = [
     { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={19} /> },
@@ -39,6 +41,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const getInitials = (name?: string) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  };
+
+  const handleLogoutConfirm = async () => {
+    setLoggingOut(true);
+    try {
+      await logout();
+      setLogoutConfirmOpen(false);
+      onClose();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
   return (
@@ -91,21 +106,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div
+            <img
+              src="/logo.png"
+              alt="CHA Asset Logo"
               style={{
                 width: '38px',
                 height: '38px',
-                borderRadius: '10px',
-                background: 'var(--primary-gradient)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
-                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)'
+                objectFit: 'contain',
+                borderRadius: '8px'
               }}
-            >
-              <Layers size={20} />
-            </div>
+            />
             <div>
               <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
                 CHA Asset
@@ -198,7 +208,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
 
           <button
-            onClick={logout}
+            onClick={() => setLogoutConfirmOpen(true)}
             style={{
               width: '100%',
               display: 'flex',
@@ -221,6 +231,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
       </aside>
+
+      {/* Confirmation Modal for Log Out */}
+      <ConfirmDialog
+        isOpen={logoutConfirmOpen}
+        variant="danger"
+        title="Konfirmasi Keluar (Log Out)"
+        message={`Apakah Anda yakin ingin keluar dari akun @${user?.username} (${user?.name})?\n\nAnda harus memasukkan kredensial login kembali untuk mengakses sistem inventaris.`}
+        confirmText="Ya, Keluar Akun"
+        cancelText="Batal"
+        isLoading={loggingOut}
+        onConfirm={handleLogoutConfirm}
+        onCancel={() => setLogoutConfirmOpen(false)}
+      />
     </>
   );
 };

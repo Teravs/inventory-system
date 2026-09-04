@@ -76,9 +76,9 @@ export const QRScannerView: React.FC<QRScannerViewProps> = ({ onScanSuccess }) =
               position: 'absolute',
               width: '65%',
               height: '65%',
-              border: '2px solid rgba(59, 130, 246, 0.7)',
+              border: '2px solid rgba(234, 88, 12, 0.85)',
               borderRadius: '16px',
-              boxShadow: '0 0 0 4000px rgba(15, 23, 42, 0.45)',
+              boxShadow: '0 0 0 4000px rgba(15, 23, 42, 0.5)',
               pointerEvents: 'none'
             }}
           >
@@ -89,7 +89,7 @@ export const QRScannerView: React.FC<QRScannerViewProps> = ({ onScanSuccess }) =
                 left: 0,
                 right: 0,
                 height: '2px',
-                background: 'linear-gradient(90deg, transparent, #38BDF8, transparent)',
+                background: 'linear-gradient(90deg, transparent, #EA580C, #DC2626, transparent)',
                 animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
               }}
             />

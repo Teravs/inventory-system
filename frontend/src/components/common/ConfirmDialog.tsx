@@ -39,9 +39,9 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         };
       case 'primary':
         return {
-          icon: <HelpCircle size={22} color="#2563EB" />,
-          bgColor: '#EFF6FF',
-          borderColor: '#BFDBFE',
+          icon: <HelpCircle size={22} color="#EA580C" />,
+          bgColor: '#FFF7ED',
+          borderColor: '#FED7AA',
           btnVariant: 'primary' as const
         };
       case 'danger':

@@ -13,19 +13,19 @@ export const Badge: React.FC<BadgeProps> = ({ variant, children }) => {
       case 'INACTIVE':
         return { bg: '#F1F5F9', color: '#475569', border: '#E2E8F0', dot: '#94A3B8' };
       case 'SUPER_ADMIN':
-        return { bg: '#FAF5FF', color: '#6D28D9', border: '#E9D5FF', dot: '#8B5CF6' };
+        return { bg: '#FEF2F2', color: '#991B1B', border: '#FECACA', dot: '#DC2626' };
       case 'ADMIN':
-        return { bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE', dot: '#3B82F6' };
+        return { bg: '#FFF7ED', color: '#C2410C', border: '#FED7AA', dot: '#EA580C' };
       case 'VIEWER':
-        return { bg: '#F0F9FF', color: '#0369A1', border: '#BAE6FD', dot: '#0EA5E9' };
+        return { bg: '#F8FAFC', color: '#475569', border: '#E2E8F0', dot: '#64748B' };
       case 'CREATE':
         return { bg: '#ECFDF5', color: '#047857', border: '#A7F3D0', dot: '#10B981' };
       case 'UPDATE':
-        return { bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE', dot: '#3B82F6' };
+        return { bg: '#FFF7ED', color: '#C2410C', border: '#FED7AA', dot: '#EA580C' };
       case 'DELETE':
         return { bg: '#FEF2F2', color: '#B91C1C', border: '#FECACA', dot: '#EF4444' };
       case 'CHANGE_ROLE':
-        return { bg: '#FAF5FF', color: '#6D28D9', border: '#E9D5FF', dot: '#8B5CF6' };
+        return { bg: '#FFF1F2', color: '#9F1239', border: '#FECDD3', dot: '#E11D48' };
       case 'ACTIVATE':
         return { bg: '#ECFDF5', color: '#047857', border: '#A7F3D0', dot: '#10B981' };
       case 'DEACTIVATE':

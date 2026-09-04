@@ -3,14 +3,20 @@
 :root {
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  --primary: #2563EB;
-  --primary-hover: #1D4ED8;
-  --primary-light: #EFF6FF;
-  --primary-gradient: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-  --primary-glow: rgba(37, 99, 235, 0.25);
+  /* Vibrant Sunset Flame / Crimson-Orange Theme */
+  --primary: #DC2626;
+  --primary-hover: #B91C1C;
+  --primary-light: #FFF7ED;
+  --primary-gradient: linear-gradient(135deg, #DC2626 0%, #EA580C 50%, #F97316 100%);
+  --primary-glow: rgba(220, 38, 38, 0.25);
   
-  --secondary: #0EA5E9;
-  --secondary-light: #F0F9FF;
+  --secondary: #EA580C;
+  --secondary-light: #FFEDD5;
+  --secondary-gradient: linear-gradient(135deg, #EA580C 0%, #F97316 100%);
+  
+  --accent-orange: #F97316;
+  --accent-red: #DC2626;
+  --accent-warm: #FFF7ED;
   
   --success: #10B981;
   --success-light: #ECFDF5;
@@ -21,15 +27,16 @@
   --danger: #EF4444;
   --danger-light: #FEF2F2;
   
-  --bg-page: #F8FAFC;
+  --bg-page: #FAF9F8;
   --surface: #FFFFFF;
-  --surface-hover: #F8FAFC;
-  --border: #E2E8F0;
-  --border-light: #F1F5F9;
+  --surface-hover: #FFF7ED;
+  --border: #E5E7EB;
+  --border-light: #F3F4F6;
+  --border-focus: #EA580C;
   
-  --text-main: #0F172A;
-  --text-sub: #64748B;
-  --text-muted: #94A3B8;
+  --text-main: #18181B;
+  --text-sub: #52525B;
+  --text-muted: #A1A1AA;
   
   --radius-xs: 4px;
   --radius-sm: 6px;
@@ -37,11 +44,11 @@
   --radius-lg: 14px;
   --radius-xl: 20px;
   
-  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --shadow-card: 0 0 0 1px rgba(226, 232, 240, 0.8), 0 2px 4px rgba(15, 23, 42, 0.03), 0 12px 24px -4px rgba(15, 23, 42, 0.06);
+  --shadow-xs: 0 1px 2px 0 rgba(24, 24, 27, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(24, 24, 27, 0.08), 0 1px 2px -1px rgba(24, 24, 27, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(220, 38, 38, 0.08), 0 2px 4px -2px rgba(234, 88, 12, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(220, 38, 38, 0.1), 0 4px 6px -4px rgba(234, 88, 12, 0.06);
+  --shadow-card: 0 0 0 1px rgba(229, 231, 235, 0.8), 0 2px 4px rgba(24, 24, 27, 0.03), 0 12px 24px -4px rgba(220, 38, 38, 0.06);
 }
 
 * {
@@ -68,7 +75,7 @@ input, button, select, textarea {
   font-family: inherit;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar with Warm Amber Accent */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -81,7 +88,7 @@ input, button, select, textarea {
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #F97316;
 }
 
 /* Layout Utilities */
@@ -124,7 +131,7 @@ input, button, select, textarea {
 
 .modern-card:hover {
   box-shadow: var(--shadow-md);
-  border-color: #CBD5E1;
+  border-color: #FED7AA;
 }
 
 /* Modern Table */
@@ -137,23 +144,23 @@ input, button, select, textarea {
 }
 
 .modern-table thead tr {
-  background-color: #F8FAFC;
-  border-bottom: 1px solid var(--border);
+  background-color: #FFF7ED;
+  border-bottom: 1px solid #FFEDD5;
 }
 
 .modern-table th {
   padding: 0.875rem 1rem;
-  font-weight: 600;
-  color: var(--text-sub);
+  font-weight: 700;
+  color: #9A3412;
   font-size: 0.775rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #FFEDD5;
 }
 
 .modern-table td {
   padding: 0.875rem 1rem;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid #F3F4F6;
   color: var(--text-main);
   vertical-align: middle;
 }
@@ -163,7 +170,7 @@ input, button, select, textarea {
 }
 
 .modern-table tbody tr:hover {
-  background-color: #F8FAFC;
+  background-color: #FFF7ED;
 }
 
 .modern-table tbody tr:last-child td {

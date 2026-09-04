@@ -167,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 fontWeight: isActive ? 600 : 500,
                 color: isActive ? 'var(--primary)' : 'var(--text-main)',
                 backgroundColor: isActive ? 'var(--primary-light)' : 'transparent',
-                border: isActive ? '1px solid rgba(191, 219, 254, 0.6)' : '1px solid transparent',
+                border: isActive ? '1px solid #FED7AA' : '1px solid transparent',
                 transition: 'all 0.15s ease'
               })}
             >
@@ -178,21 +178,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </nav>
 
         {/* User Card & Logout */}
-        <div style={{ padding: '1rem', borderTop: '1px solid var(--border-light)', backgroundColor: '#F8FAFC' }}>
+        <div style={{ padding: '1rem', borderTop: '1px solid var(--border-light)', backgroundColor: '#FAF9F8' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.85rem', padding: '0.25rem' }}>
             <div
               style={{
                 width: '36px',
                 height: '36px',
                 borderRadius: '50%',
-                backgroundColor: '#EDE9FE',
-                color: '#6D28D9',
+                backgroundColor: '#FFF7ED',
+                color: '#EA580C',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 700,
                 fontSize: '0.825rem',
-                border: '1px solid #DDD6FE'
+                border: '1px solid #FFEDD5'
               }}
             >
               {getInitials(user?.name)}

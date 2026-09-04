@@ -138,13 +138,13 @@ export const CategoryListPage: React.FC = () => {
             </h1>
             <span
               style={{
-                backgroundColor: '#F0F9FF',
-                color: 'var(--secondary)',
+                backgroundColor: '#FFEDD5',
+                color: '#EA580C',
                 padding: '0.2rem 0.65rem',
                 borderRadius: '9999px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                border: '1px solid #BAE6FD'
+                border: '1px solid #FED7AA'
               }}
             >
               {categories.length} Categories
@@ -202,7 +202,7 @@ export const CategoryListPage: React.FC = () => {
                       {c.name}
                     </td>
                     <td>
-                      <span style={{ backgroundColor: '#F1F5F9', padding: '0.25rem 0.65rem', borderRadius: 'var(--radius-sm)', fontSize: '0.775rem', fontWeight: 600, color: 'var(--text-sub)' }}>
+                      <span style={{ backgroundColor: '#FFF7ED', border: '1px solid #FFEDD5', padding: '0.25rem 0.65rem', borderRadius: 'var(--radius-sm)', fontSize: '0.775rem', fontWeight: 600, color: '#EA580C' }}>
                         {c._count?.inventories ?? 0} items
                       </span>
                     </td>

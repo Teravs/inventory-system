@@ -212,13 +212,13 @@ export const UserListPage: React.FC = () => {
             </h1>
             <span
               style={{
-                backgroundColor: '#FAF5FF',
-                color: '#7C3AED',
+                backgroundColor: '#FFE4E6',
+                color: '#E11D48',
                 padding: '0.2rem 0.65rem',
                 borderRadius: '9999px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                border: '1px solid #E9D5FF'
+                border: '1px solid #FECDD3'
               }}
             >
               {users.length} Users

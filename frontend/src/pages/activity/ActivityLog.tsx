@@ -108,13 +108,13 @@ export const ActivityLogPage: React.FC = () => {
             </h1>
             <span
               style={{
-                backgroundColor: isSuperAdmin ? '#EDE9FE' : '#EFF6FF',
-                color: isSuperAdmin ? '#6D28D9' : 'var(--primary)',
+                backgroundColor: isSuperAdmin ? '#FEF2F2' : '#FFF7ED',
+                color: isSuperAdmin ? '#DC2626' : '#EA580C',
                 padding: '0.2rem 0.65rem',
                 borderRadius: '9999px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                border: `1px solid ${isSuperAdmin ? '#DDD6FE' : '#DBEAFE'}`
+                border: `1px solid ${isSuperAdmin ? '#FECACA' : '#FED7AA'}`
               }}
             >
               {logs.length} Entries
@@ -133,7 +133,7 @@ export const ActivityLogPage: React.FC = () => {
             onClick={handleExportPdf}
             isLoading={exporting}
             disabled={loading}
-            style={{ boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)' }}
+            style={{ boxShadow: '0 2px 8px rgba(220, 38, 38, 0.28)' }}
           >
             <FileDown size={17} /> Export PDF ({selectedMonth ? formatMonthDisplay(selectedMonth) : 'Semua'})
           </Button>
@@ -252,9 +252,9 @@ export const ActivityLogPage: React.FC = () => {
               style={{
                 padding: '0.55rem 0.85rem',
                 borderRadius: 'var(--radius-md)',
-                border: '1px solid #BFDBFE',
-                backgroundColor: '#EFF6FF',
-                color: 'var(--primary)',
+                border: '1px solid #FED7AA',
+                backgroundColor: '#FFF7ED',
+                color: '#EA580C',
                 fontSize: '0.875rem',
                 fontWeight: 600,
                 display: 'flex',
@@ -263,7 +263,7 @@ export const ActivityLogPage: React.FC = () => {
               }}
             >
               <Boxes size={16} />
-              <span>INVENTORY (Data Barang)</span>
+              <span>INVENTORY (Data Barang Saja)</span>
             </div>
           )}
         </div>

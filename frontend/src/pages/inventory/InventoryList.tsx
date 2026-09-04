@@ -259,13 +259,13 @@ export const InventoryListPage: React.FC = () => {
             </h1>
             <span
               style={{
-                backgroundColor: '#EFF6FF',
-                color: 'var(--primary)',
+                backgroundColor: '#FFF7ED',
+                color: '#EA580C',
                 padding: '0.2rem 0.65rem',
                 borderRadius: '9999px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                border: '1px solid #DBEAFE'
+                border: '1px solid #FED7AA'
               }}
             >
               {items.length} Assets
@@ -415,7 +415,7 @@ export const InventoryListPage: React.FC = () => {
                       </div>
                     </td>
                     <td>
-                      <span style={{ backgroundColor: '#F1F5F9', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', fontSize: '0.775rem', fontWeight: 500, color: 'var(--text-main)' }}>
+                      <span style={{ backgroundColor: '#FFF7ED', border: '1px solid #FFEDD5', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', fontSize: '0.775rem', fontWeight: 600, color: '#EA580C' }}>
                         {item.category?.name || 'General'}
                       </span>
                     </td>

@@ -28,7 +28,7 @@ export const ScannerPage: React.FC = () => {
             borderRadius: '12px',
             color: '#FFFFFF',
             marginBottom: '0.75rem',
-            boxShadow: '0 4px 10px rgba(37, 99, 235, 0.25)'
+            boxShadow: '0 4px 10px rgba(220, 38, 38, 0.28)'
           }}
         >
           <QrCode size={26} />

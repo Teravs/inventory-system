@@ -48,9 +48,9 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
       case 'info':
       default:
         return {
-          icon: <Info size={32} color="#2563EB" />,
-          bgColor: '#EFF6FF',
-          borderColor: '#BFDBFE',
+          icon: <Info size={32} color="#EA580C" />,
+          bgColor: '#FFF7ED',
+          borderColor: '#FED7AA',
           btnVariant: 'primary' as const
         };
     }

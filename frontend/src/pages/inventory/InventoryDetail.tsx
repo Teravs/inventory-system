@@ -251,19 +251,19 @@ export const InventoryDetailPage: React.FC = () => {
           </div>
 
           {user?.role !== 'VIEWER' && item.devicePassword && (
-            <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', backgroundColor: '#EFF6FF', borderRadius: 'var(--radius-lg)', border: '1px solid #BFDBFE' }}>
+            <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', backgroundColor: '#FFF7ED', borderRadius: 'var(--radius-lg)', border: '1px solid #FED7AA' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#EA580C', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                   <KeyRound size={14} /> Device Access Password
                 </span>
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 600 }}
+                  style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#EA580C', fontSize: '0.8rem', fontWeight: 600 }}
                 >
                   {showPassword ? <><EyeOff size={14} /> Hide</> : <><Eye size={14} /> Show Password</>}
                 </button>
               </div>
-              <div style={{ marginTop: '0.35rem', fontFamily: 'monospace', fontWeight: 700, fontSize: '1rem', color: '#1E3A8A' }}>
+              <div style={{ marginTop: '0.35rem', fontFamily: 'monospace', fontWeight: 700, fontSize: '1rem', color: '#9A3412' }}>
                 {showPassword ? item.devicePassword : '••••••••••••'}
               </div>
             </div>

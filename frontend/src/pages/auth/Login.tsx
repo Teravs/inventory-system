@@ -37,8 +37,8 @@ export const LoginPage: React.FC = () => {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#0F172A',
-        backgroundImage: 'radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.18) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(147, 51, 234, 0.15) 0px, transparent 50%)',
+        backgroundColor: '#18181B',
+        backgroundImage: 'radial-gradient(at 0% 0%, rgba(220, 38, 38, 0.25) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(234, 88, 12, 0.22) 0px, transparent 50%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -103,7 +103,7 @@ export const LoginPage: React.FC = () => {
             autoComplete="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="superadmin"
+            placeholder="tera"
           />
 
           <Input

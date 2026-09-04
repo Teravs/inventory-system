@@ -44,33 +44,33 @@ export const exportActivityLogsToPdf = ({
   });
 
   // 1. Header Background Accent
-  doc.setFillColor(37, 99, 235); // Primary Blue
+  doc.setFillColor(220, 38, 38); // Crimson Red
   doc.rect(0, 0, pageWidth, 5, 'F');
 
   // 2. Company & Document Branding
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-  doc.setTextColor(15, 23, 42); // Slate 900
+  doc.setTextColor(24, 24, 27); // Dark Zinc
   doc.text('CHA ASSET — AUDIT & ACTIVITY LOG REPORT', 14, 16);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(100, 116, 139); // Slate 500
+  doc.setTextColor(113, 113, 122); // Zinc 500
   doc.text('Sistem Informasi & Manajemen Inventaris Perangkat Internal', 14, 22);
 
   // 3. Metadata Information Card (Right and Left)
-  doc.setFillColor(248, 250, 252); // Slate 50
-  doc.setDrawColor(226, 232, 240); // Border
+  doc.setFillColor(255, 247, 237); // Warm Peach Tint (Orange 50)
+  doc.setDrawColor(254, 215, 170); // Border Orange 200
   doc.roundedRect(14, 26, pageWidth - 28, 16, 2, 2, 'FD');
 
   doc.setFontSize(9);
-  doc.setTextColor(51, 65, 85);
+  doc.setTextColor(82, 82, 91);
 
   // Left info: Periode & Total Entries
   doc.setFont('helvetica', 'bold');
   doc.text('Periode Audit:', 18, 32);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(37, 99, 235);
+  doc.setTextColor(220, 38, 38); // Red
   doc.setFont('helvetica', 'bold');
   doc.text(monthLabel.toUpperCase(), 43, 32);
 

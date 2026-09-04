@@ -29,7 +29,7 @@ export const Button: React.FC<ButtonProps> = ({
       transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
       fontSize: size === 'sm' ? '0.8125rem' : size === 'lg' ? '1rem' : '0.875rem',
       padding: size === 'sm' ? '0.4rem 0.85rem' : size === 'lg' ? '0.75rem 1.5rem' : '0.55rem 1.15rem',
-      boxShadow: variant === 'primary' ? '0 1px 2px 0 rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.15)' : 'var(--shadow-xs)',
+      boxShadow: variant === 'primary' ? '0 2px 8px rgba(220, 38, 38, 0.28), 0 1px 2px rgba(234, 88, 12, 0.2)' : 'var(--shadow-xs)',
       userSelect: 'none'
     };
 

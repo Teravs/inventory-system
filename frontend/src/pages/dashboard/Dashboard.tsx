@@ -25,6 +25,7 @@ export const DashboardPage: React.FC = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        setLoading(true);
         const res = await api.get('/dashboard/stats');
         setData(res.data.data);
       } catch (err) {
@@ -61,10 +62,10 @@ export const DashboardPage: React.FC = () => {
     {
       label: 'Total Inventory',
       value: data.cards.totalInventory,
-      icon: <Boxes size={22} color="#2563EB" />,
-      bg: '#EFF6FF',
-      border: '#BFDBFE',
-      accent: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)'
+      icon: <Boxes size={22} color="#DC2626" />,
+      bg: '#FFF7ED',
+      border: '#FFEDD5',
+      accent: 'linear-gradient(135deg, #DC2626 0%, #EA580C 100%)'
     },
     {
       label: 'Active Items',
@@ -77,26 +78,26 @@ export const DashboardPage: React.FC = () => {
     {
       label: 'Inactive Items',
       value: data.cards.inactiveInventory,
-      icon: <XCircle size={22} color="#DC2626" />,
-      bg: '#FEF2F2',
-      border: '#FECACA',
-      accent: 'linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)'
+      icon: <XCircle size={22} color="#64748B" />,
+      bg: '#F8FAFC',
+      border: '#E2E8F0',
+      accent: 'linear-gradient(135deg, #64748B 0%, #475569 100%)'
     },
     {
       label: 'Active Categories',
       value: data.cards.totalCategories,
-      icon: <Tags size={22} color="#0284C7" />,
-      bg: '#F0F9FF',
-      border: '#BAE6FD',
-      accent: 'linear-gradient(135deg, #0EA5E9 0%, #0369A1 100%)'
+      icon: <Tags size={22} color="#EA580C" />,
+      bg: '#FFEDD5',
+      border: '#FED7AA',
+      accent: 'linear-gradient(135deg, #EA580C 0%, #F97316 100%)'
     },
     {
       label: 'Active Users',
       value: data.cards.totalUsers,
-      icon: <Users size={22} color="#7C3AED" />,
-      bg: '#FAF5FF',
-      border: '#E9D5FF',
-      accent: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)'
+      icon: <Users size={22} color="#E11D48" />,
+      bg: '#FFE4E6',
+      border: '#FECDD3',
+      accent: 'linear-gradient(135deg, #E11D48 0%, #FB7185 100%)'
     }
   ];
 
@@ -243,7 +244,7 @@ export const DashboardPage: React.FC = () => {
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-sub)' }}>{item.brand || 'Standard Unit'}</div>
                     </td>
                     <td>
-                      <span style={{ backgroundColor: '#F1F5F9', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', fontSize: '0.775rem', fontWeight: 500, color: 'var(--text-main)' }}>
+                      <span style={{ backgroundColor: '#FFF7ED', border: '1px solid #FFEDD5', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', fontSize: '0.775rem', fontWeight: 600, color: '#EA580C' }}>
                         {item.category?.name || 'General'}
                       </span>
                     </td>
